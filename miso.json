@@ -1,0 +1,228 @@
+{
+  "categories": {
+    "All": [
+      {
+        "mealId": 1001,
+        "name": "Sushi Platter",
+        "image": "https://bosusushii.com.au/wp-content/uploads/2021/04/Mixed-Maki-Platter-e1622959006134-800x800.png",
+        "price": 20.99,
+        "description": "A variety of sushi rolls served with soy sauce and wasabi.",
+        "category": "Japanese Food",
+        "ingredients": ["Rice", "Nori", "Fish", "Soy Sauce", "Wasabi"],
+        "calories": 500,
+        "spice_level": "Mild",
+        "preparation_time": "30 minutes",
+        "serving_size": "12 pieces",
+        "allergens": ["Fish", "Soy"],
+        "nutrition_facts": {
+          "fat": "15g",
+          "carbohydrates": "50g",
+          "protein": "25g",
+          "sodium": "1200mg"
+        }
+      },
+      {
+        "mealId": 1002,
+        "name": "Seafood Paella",
+        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRjLPp02RqU4gl3Ncz7pBmOXbGcDGI-hkbNkw&s",
+        "price": 25.50,
+        "description": "A traditional Spanish rice dish with mixed seafood.",
+        "category": "Seafood",
+        "ingredients": ["Rice", "Shrimp", "Mussels", "Saffron"],
+        "calories": 700,
+        "spice_level": "Medium",
+        "preparation_time": "45 minutes",
+        "serving_size": "1 plate",
+        "allergens": ["Shellfish"],
+        "nutrition_facts": {
+          "fat": "20g",
+          "carbohydrates": "75g",
+          "protein": "35g",
+          "sodium": "1500mg"
+        }
+      },
+      {
+        "mealId": 1003,
+        "name": "Miso Soup",
+        "image": "https://assets.epicurious.com/photos/63ceb68b7d88c936746ada44/1:1/w_1600,c_limit/MisoSoup_RECIPE_012023_46093.jpg",
+        "price": 5.00,
+        "description": "Traditional Japanese soup made with tofu, seaweed, and miso paste.",
+        "category": "Soup",
+        "ingredients": ["Tofu", "Miso paste", "Seaweed", "Spring onions"],
+        "calories": 100,
+        "spice_level": "None",
+        "preparation_time": "10 minutes",
+        "serving_size": "1 bowl",
+        "allergens": ["Soy"],
+        "nutrition_facts": {
+          "fat": "5g",
+          "carbohydrates": "10g",
+          "protein": "7g",
+          "sodium": "800mg"
+        }
+      }
+    ],
+    "Japanese Food": [
+      {
+        "mealId": 1001,
+        "name": "Sushi Platter",
+        "image": "https://138279933.cdn6.editmysite.com/uploads/1/3/8/2/138279933/s126008894303816485_p56_i3_w1000.jpeg?width=2400&optimize=medium",
+        "price": 20.99,
+        "description": "A variety of sushi rolls served with soy sauce and wasabi.",
+        "ingredients": ["Rice", "Nori", "Fish", "Soy Sauce", "Wasabi"],
+        "calories": 500,
+        "spice_level": "Mild",
+        "preparation_time": "30 minutes",
+        "serving_size": "12 pieces",
+        "allergens": ["Fish", "Soy"],
+        "nutrition_facts": {
+          "fat": "15g",
+          "carbohydrates": "50g",
+          "protein": "25g",
+          "sodium": "1200mg"
+        }
+      },
+      {
+        "mealId": 1004,
+        "name": "Ramen",
+        "image": "https://minimalistbaker.com/wp-content/uploads/2015/08/AMAZING-Vegan-Ramen-with-just-10-ingredients-Simple-methods-plant-based-SO-delicious-vegan-recipe-ramen-soup-healthy-dinner.jpg",
+        "price": 15.50,
+        "description": "Traditional Japanese noodle soup with pork, eggs, and vegetables.",
+        "ingredients": ["Noodles", "Pork", "Eggs", "Miso broth"],
+        "calories": 600,
+        "spice_level": "Mild",
+        "preparation_time": "20 minutes",
+        "serving_size": "1 bowl",
+        "allergens": ["Wheat", "Eggs"],
+        "nutrition_facts": {
+          "fat": "20g",
+          "carbohydrates": "65g",
+          "protein": "30g",
+          "sodium": "1800mg"
+        }
+      }
+    ],
+    "Seafood": [
+      {
+        "mealId": 1002,
+        "name": "Seafood Paella",
+        "image": "https://simply-delicious-food.com/wp-content/uploads/2020/10/0E2A1651-2.jpg",
+        "price": 25.50,
+        "description": "A traditional Spanish rice dish with mixed seafood.",
+        "ingredients": ["Rice", "Shrimp", "Mussels", "Saffron"],
+        "calories": 700,
+        "spice_level": "Medium",
+        "preparation_time": "45 minutes",
+        "serving_size": "1 plate",
+        "allergens": ["Shellfish"],
+        "nutrition_facts": {
+          "fat": "20g",
+          "carbohydrates": "75g",
+          "protein": "35g",
+          "sodium": "1500mg"
+        }
+      },
+      {
+        "mealId": 1005,
+        "name": "Grilled Lobster",
+        "image": "https://harborfish.com/wp-content/uploads/2018/06/grilled-lobster1.jpg",
+        "price": 30.00,
+        "description": "Grilled lobster served with garlic butter sauce.",
+        "ingredients": ["Lobster", "Garlic", "Butter"],
+        "calories": 450,
+        "spice_level": "Mild",
+        "preparation_time": "35 minutes",
+        "serving_size": "1 lobster",
+        "allergens": ["Shellfish", "Dairy"],
+        "nutrition_facts": {
+          "fat": "25g",
+          "carbohydrates": "10g",
+          "protein": "40g",
+          "sodium": "900mg"
+        }
+      }
+    ],
+    "Top of the Week": [
+      {
+        "mealId": 1006,
+        "name": "Spicy Tuna Roll",
+        "image": "https://www.sushi-saarbruecken.de/erelreew/2016/12/rolls_04_crispyspicytuna_4642.jpg",
+        "price": 12.99,
+        "description": "Sushi roll made with spicy tuna, cucumber, and avocado.",
+        "category": "Japanese Food",
+        "ingredients": ["Tuna", "Rice", "Avocado", "Cucumber", "Spicy mayo"],
+        "calories": 450,
+        "spice_level": "Medium",
+        "preparation_time": "25 minutes",
+        "serving_size": "6 pieces",
+        "allergens": ["Fish", "Soy"],
+        "nutrition_facts": {
+          "fat": "18g",
+          "carbohydrates": "35g",
+          "protein": "22g",
+          "sodium": "1000mg"
+        }
+      },
+      {
+        "mealId": 1007,
+        "name": "Crab Bisque",
+        "image": "https://www.wholesomeyum.com/wp-content/uploads/2023/03/wholesomeyum-Lobster-Bisque-683x683.jpg",
+        "price": 18.50,
+        "description": "Creamy seafood soup made with crab meat and fresh herbs.",
+        "category": "Soup",
+        "ingredients": ["Crab", "Cream", "Herbs", "Garlic"],
+        "calories": 300,
+        "spice_level": "Mild",
+        "preparation_time": "20 minutes",
+        "serving_size": "1 bowl",
+        "allergens": ["Shellfish", "Dairy"],
+        "nutrition_facts": {
+          "fat": "20g",
+          "carbohydrates": "10g",
+          "protein": "18g",
+          "sodium": "800mg"
+        }
+      }
+    ],
+    "Soup": [
+      {
+        "mealId": 1003,
+        "name": "Miso Soup",
+        "image": "https://assets.epicurious.com/photos/63ceb68b7d88c936746ada44/1:1/w_1600,c_limit/MisoSoup_RECIPE_012023_46093.jpg",
+        "price": 5.00,
+        "description": "Traditional Japanese soup made with tofu, seaweed, and miso paste.",
+        "ingredients": ["Tofu", "Miso paste", "Seaweed", "Spring onions"],
+        "calories": 100,
+        "spice_level": "None",
+        "preparation_time": "10 minutes",
+        "serving_size": "1 bowl",
+        "allergens": ["Soy"],
+        "nutrition_facts": {
+          "fat": "5g",
+          "carbohydrates": "10g",
+          "protein": "7g",
+          "sodium": "800mg"
+        }
+      },
+      {
+        "mealId": 1007,
+        "name": "Crab Bisque",
+        "image": "https://www.wholesomeyum.com/wp-content/uploads/2023/03/wholesomeyum-Lobster-Bisque-683x683.jpg",
+        "price": 18.50,
+        "description": "Creamy seafood soup made with crab meat and fresh herbs.",
+        "ingredients": ["Crab", "Cream", "Herbs", "Garlic"],
+        "calories": 300,
+        "spice_level": "Mild",
+        "preparation_time": "20 minutes",
+        "serving_size": "1 bowl",
+        "allergens": ["Shellfish", "Dairy"],
+        "nutrition_facts": {
+          "fat": "20g",
+          "carbohydrates": "10g",
+          "protein": "18g",
+          "sodium": "800mg"
+        }
+      }
+    ]
+  }
+}
