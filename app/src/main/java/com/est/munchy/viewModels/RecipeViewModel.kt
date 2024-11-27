@@ -58,8 +58,7 @@ class RecipeViewModel @Inject constructor(
             }
 
             // Monitor network availability
-            networkChecker.NetworkAvailabilityChecker(getApplication()).collect { isOnline ->
-                _uiState.update { it.copy(isOnline = isOnline) }
+            networkChecker.getNetworkAvailability().collect { isOnline ->
                 networkStatus = isOnline
                 showNetworkStatus()
             }

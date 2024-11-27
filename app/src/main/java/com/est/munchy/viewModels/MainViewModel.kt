@@ -48,7 +48,7 @@ class MainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             repository.local.readRecipes().collect { recipes ->
-                _uiState.update { it.copy(recipes = recipes.flatMap { it.recipe }) }
+                _uiState.update { it.copy(recipes = recipes.flatMap {it.recipe.result}) }
             }
             repository.local.readBooked().collect { favorites ->
                 _uiState.update { it.copy(favoriteRecipes = favorites) }
