@@ -7,7 +7,7 @@ import com.est.munchy.domain.model.FoodJokes
 import com.est.munchy.utils.AppConstants
 
 @Entity(tableName = AppConstants.Companion.FOOD_JOKE_TABLE)
-class FoodJokeEntity (
+class FoodJokesEntity (
     @Embedded
     var foodJoke: FoodJokes
 ) {
