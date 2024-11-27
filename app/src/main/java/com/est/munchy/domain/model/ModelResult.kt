@@ -3,6 +3,7 @@ package com.est.munchy.domain.model
 import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
 import kotlinx.parcelize.Parcelize
+import kotlinx.parcelize.RawValue
 
 @Parcelize
 data class ModelResult(
@@ -13,7 +14,7 @@ data class ModelResult(
     @SerializedName("dairyFree")
     val dairyFree: Boolean,
     @SerializedName("extendedIngredients")
-    val extendedIngredients: @RawValue List<ExtendedIngredient>,
+    val extendedIngredients: @RawValue List<Ingredients>,
     @SerializedName("glutenFree")
     val glutenFree: Boolean,
     @SerializedName("id")

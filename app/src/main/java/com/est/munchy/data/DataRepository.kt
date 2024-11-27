@@ -10,7 +10,6 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.est.munchy.domain.model.MealAndDietType
-import com.est.munchy.utils.AppConstants
 import com.est.munchy.utils.AppConstants.Companion.DEFAULT_DIET_TYPE
 import com.est.munchy.utils.AppConstants.Companion.DEFAULT_MEAL_TYPE
 import com.est.munchy.utils.AppConstants.Companion.PREFERENCES_BACK_ONLINE
@@ -26,7 +25,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import java.io.IOException
 import javax.inject.Inject
-import javax.inject.Singleton
 
 private val Context.dataStore by preferencesDataStore(PREFERENCES_NAME)
 

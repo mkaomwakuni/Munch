@@ -1,6 +1,8 @@
 package com.est.munchy.data.remote
 
 import com.est.munchy.data.network.MunchApi
+import com.est.munchy.domain.model.FoodJokes
+import com.est.munchy.domain.model.MunchRecipe
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -16,7 +18,7 @@ class RemoteDataSource @Inject constructor(
         return munchApi.searchRecipes(searchQuery)
     }
 
-    suspend fun getFoodJoke(apiKey: String): Response<FoodJoke> {
+    suspend fun getFoodJoke(apiKey: String): Response<FoodJokes> {
         return munchApi.getFoodJoke(apiKey)
     }
 }
