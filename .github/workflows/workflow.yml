@@ -14,16 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Step 2: Set up JDK 17.0.11 (since you are using JBR 17.0.11)
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '17'  
-      # Step 3: Cache Gradle dependencies
+          java-version: '17'
+          distribution: 'adoptopenjdk'
+
       - name: Cache Gradle dependencies
         uses: actions/cache@v3
         with:
@@ -32,26 +31,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-      # Step 4: Set up Android SDK
       - name: Set up Android SDK
         uses: android-actions/setup-android@v2
         with:
-          api-level: 34 
+          api-level: 34
           build-tools: 34.0.0
           sdk-dir: ${{ github.workspace }}/android-sdk
 
-      # Step 5: Run Gradle build (assemble the app)
       - name: Build Android project
-        run: ./gradlew build
+        run: ./gradlew build --stacktrace
 
-      # Step 6: Run unit tests
       - name: Run unit tests
         run: ./gradlew test
 
-      # Step 7: Run Android lint for static code analysis
       - name: Run lint
         run: ./gradlew lint
 
-      # Optional Step 8: Run instrumented tests (e.g., UI tests)
       - name: Run instrumented tests
         run: ./gradlew connectedAndroidTest
