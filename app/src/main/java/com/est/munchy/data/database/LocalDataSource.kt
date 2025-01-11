@@ -2,7 +2,7 @@ package com.est.munchy.data.database
 
 import com.est.munchy.data.database.local.dao.MunchDao
 import com.est.munchy.data.database.local.entities.BookedRecipeEntity
-import com.est.munchy.data.database.local.entities.FoodJokeEntity
+import com.est.munchy.data.database.local.entities.FoodJokesEntity
 import com.est.munchy.data.database.local.entities.RecipeEntity
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -19,7 +19,7 @@ class LocalDataSource @Inject constructor(
         return munchDao.readBookedRecipes()
     }
 
-    fun readJokes() : Flow<List<FoodJokeEntity>> {
+    fun readJokes() : Flow<List<FoodJokesEntity>> {
         return  munchDao.readFoodJoke()
     }
 
@@ -31,7 +31,7 @@ class LocalDataSource @Inject constructor(
         munchDao.insertBookedMarked(bookedRecipeEntity)
     }
 
-    suspend fun insertJokes(foodJokeEntity: FoodJokeEntity) {
+    suspend fun insertJokes(foodJokeEntity: FoodJokesEntity) {
         munchDao.insertFoodJoke(foodJokeEntity)
     }
 

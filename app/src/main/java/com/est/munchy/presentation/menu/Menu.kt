@@ -2,6 +2,7 @@ package com.est.munchy.presentation.menu
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -40,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -82,7 +85,7 @@ fun MenuScreen(navController: NavController) {
                 .padding(16.dp)
         ) {
             Text(
-                "Our Food",
+                "Our Recipes",
                 style = MaterialTheme.typography.titleMedium,
 
                 color = Color.Gray)
@@ -120,52 +123,6 @@ fun SearchBar(placeholder: String = "Search on Munch") {
 }
 
 @Composable
-fun DeliveryCard() {
-    Card(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF2E7D32)
-        ),
-        shape = RoundedCornerShape(8.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .height(120.dp)
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    "Delivery to Home",
-                    fontSize = 16.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "Utama Street no. 14, Rumbai",
-                    color = Color.White.copy(alpha = 0.8f)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    "2.4 km",
-                    color = Color(0xFF2E7D32),
-                    modifier = Modifier
-                        .background(Color.White, RoundedCornerShape(6.dp))
-                        .padding(4.dp)
-
-                )
-            }
-
-            Icon(
-                Icons.Default.ArrowForward,
-                contentDescription = null,
-                tint = Color.White)
-        }
-    }
-}
-
-@Composable
 fun PromotionCard() {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -195,34 +152,6 @@ fun PromotionCard() {
                 modifier = Modifier.size(100.dp),
                 contentScale = ContentScale.Crop
             )
-        }
-    }
-}
-
-@Composable
-fun TopOfWeekItems() {
-    LazyRow {
-        items(3) { index ->
-            Card(
-                modifier = Modifier
-                    .width(150.dp)
-                    .padding(end = 16.dp)
-            ) {
-                Column {
-                    Image(
-                        painter = painterResource(id = R.drawable.plate),
-                        contentDescription = "Food Item",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(modifier = Modifier.padding(8.dp)) {
-                        Text("Food Item ${index + 1}", fontWeight = FontWeight.Bold)
-                        Text("$${14.99 + index * 5}", color = Color(0xFF2E7D32))
-                    }
-                }
-            }
         }
     }
 }
@@ -285,10 +214,4 @@ fun MenuGrid() {
 fun MenuScreenPreview() {
     val navController = rememberNavController()
     MenuScreen(navController)
-}
-
-@Preview
-@Composable
-fun MenuScreenPreview2() {
-    DeliveryCard()
 }

@@ -21,8 +21,7 @@ fun OutlinedButtonComposable(text: String, painter: Painter,onClick: () -> Unit)
     OutlinedButton(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
-        .clip(RoundedCornerShape(10.dp)),
+            .height(60.dp),
         shape = RectangleShape,
         onClick = onClick
     ) {

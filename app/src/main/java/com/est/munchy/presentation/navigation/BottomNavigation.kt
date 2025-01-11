@@ -24,20 +24,20 @@ fun BottomNavigation(navController: NavController) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = null) },
             label = { Text("Home") },
-            selected = navController.currentDestination?.route == "home",
-            onClick = { navController.navigate("home") }
+            selected = navController.currentDestination?.route == Routes.HomeScreen.route,
+            onClick = { navController.navigate(route = Routes.HomeScreen.route) }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Menu, contentDescription = null) },
             label = { Text("Menu") },
-            selected = navController.currentDestination?.route == "menu",
-            onClick = { navController.navigate("menu") }
+            selected = navController.currentDestination?.route == Routes.MenuScreen.route,
+            onClick = { navController.navigate(route = Routes.MenuScreen.route) }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = null) },
             label = { Text("Profile") },
             selected = false,
-            onClick = { /* Handle profile navigation */ }
+            onClick = { navController.navigate(route = Routes.ProfileScreen.route) }
         )
     }
 }

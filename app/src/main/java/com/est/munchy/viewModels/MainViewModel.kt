@@ -18,7 +18,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.est.munchy.data.Repository
 import com.est.munchy.data.database.local.entities.BookedRecipeEntity
-import com.est.munchy.data.database.local.entities.FoodJokeEntity
+import com.est.munchy.data.database.local.entities.FoodJokesEntity
 import com.est.munchy.data.database.local.entities.RecipeEntity
 import com.est.munchy.domain.model.FoodJokes
 import com.est.munchy.domain.model.MunchRecipe
@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
+import kotlin.collections.firstOrNull
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -94,7 +95,7 @@ class MainViewModel @Inject constructor(
             repository.local.insertBooked(bookedRecipeEntity)
         }
 
-    private fun insertFoodJoke(foodJokeEntity: FoodJokeEntity) =
+    private fun insertFoodJoke(foodJokeEntity: FoodJokesEntity) =
         viewModelScope.launch(Dispatchers.IO) {
             repository.local.insertJokes(foodJokeEntity)
         }
@@ -218,7 +219,7 @@ class MainViewModel @Inject constructor(
     }
 
     private fun offlineCacheFoodJoke(foodJoke: FoodJokes) {
-        val foodJokeEntity = FoodJokeEntity(foodJoke)
+        val foodJokeEntity = FoodJokesEntity(foodJoke)
         insertFoodJoke(foodJokeEntity)
     }
 

@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.est.munchy.data.database.local.entities.BookedRecipeEntity
-import com.est.munchy.data.database.local.entities.FoodJokeEntity
+import com.est.munchy.data.database.local.entities.FoodJokesEntity
 import com.est.munchy.data.database.local.entities.RecipeEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -20,7 +20,7 @@ interface MunchDao {
     suspend fun insertBookedMarked(recipesEntity: BookedRecipeEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFoodJoke(foodJokeEntity: FoodJokeEntity)
+    suspend fun insertFoodJoke(foodJokeEntity: FoodJokesEntity)
 
     @Query("SELECT * FROM munch_recipes_table ORDER BY id ASC")
     fun readRecipes(): Flow<List<RecipeEntity>>
@@ -29,7 +29,7 @@ interface MunchDao {
     fun readBookedRecipes(): Flow<List<BookedRecipeEntity>>
 
     @Query("SELECT * FROM food_joke_table ORDER BY id ASC")
-    fun readFoodJoke(): Flow<List<FoodJokeEntity>>
+    fun readFoodJoke(): Flow<List<FoodJokesEntity>>
 
     @Delete
     suspend fun deleteBookedRecipe(bookedRecipeEntity: BookedRecipeEntity)

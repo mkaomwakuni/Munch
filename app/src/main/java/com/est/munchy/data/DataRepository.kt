@@ -99,5 +99,4 @@ class DataStoreRepository @Inject constructor(@ApplicationContext private val co
             val backOnline = preferences[PreferenceKeys.backOnline] ?: false
             backOnline
         }
-
 }
