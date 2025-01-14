@@ -24,6 +24,7 @@ koin = "3.5.6"
 mapsCompose = "2.11.4"
 mapsSdk = "19.0.0"
 leakCanary = "2.14"
+roomKtx = "2.6.1"
 shimmer = "0.5.0"
 timber = "5.0.1"
 kotlinxSerializationJson = "1.7.2"
@@ -35,6 +36,7 @@ navigation = "2.8.4"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidCompiler" }

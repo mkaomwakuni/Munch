@@ -96,7 +96,11 @@ fun MenuScreen(navController: NavController) {
                 color = Color(0xFF2E7D32)
             )
             Spacer(modifier = Modifier.height(16.dp))
-            SearchBar(placeholder = "Search Your Menus")
+            SearchBar(
+                value = "",
+                onValueChange = { },
+                placeholder = "Search Your Menus"
+            )
             Spacer(modifier = Modifier.height(16.dp))
             CategoryTabs()
             Spacer(modifier = Modifier.height(16.dp))
@@ -106,7 +110,10 @@ fun MenuScreen(navController: NavController) {
 }
 
 @Composable
-fun SearchBar(placeholder: String = "Search on Munch") {
+fun SearchBar(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String = "Search on Munch") {
     TextField(
         value = "",
         onValueChange = { },

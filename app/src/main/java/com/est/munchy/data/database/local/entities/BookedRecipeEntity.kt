@@ -6,7 +6,7 @@ import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.utils.AppConstants
 
 @Entity(tableName = AppConstants.FAVORITES_TABLE)
-class BookedRecipeEntity(
+data class BookedRecipeEntity(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,
     var result: ModelResult

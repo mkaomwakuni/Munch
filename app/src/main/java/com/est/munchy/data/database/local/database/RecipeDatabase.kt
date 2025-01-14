@@ -9,13 +9,15 @@ import com.est.munchy.data.database.local.entities.FoodJokesEntity
 import com.est.munchy.data.database.local.entities.RecipeEntity
 
 @Database(
-    entities = [RecipeEntity::class,FoodJokesEntity::class,BookedRecipeEntity::class],
+    entities = [
+        RecipeEntity::class,
+        FoodJokesEntity::class,
+        BookedRecipeEntity::class
+    ],
     version = 1,
     exportSchema = false
 )
 @TypeConverters(MunchTypeConverter::class)
-abstract class RecipeDatabase: RoomDatabase() {
-
+abstract class RecipeDatabase : RoomDatabase() {
     abstract fun munchDao(): MunchDao
-
 }

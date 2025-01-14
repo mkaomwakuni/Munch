@@ -15,17 +15,18 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-    @Singleton
     @Provides
+    @Singleton
     fun providesDatabase(
         @ApplicationContext context: Context
     ) = Room.databaseBuilder(
         context,
         RecipeDatabase::class.java,
         AppConstants.DATABASE_NAME
-    ).build()
+    ).fallbackToDestructiveMigration()
+        .build()
 
-    @Singleton
     @Provides
+    @Singleton
     fun providesDao(database: RecipeDatabase) = database.munchDao()
 }

@@ -6,7 +6,7 @@ import com.est.munchy.domain.model.MunchRecipe
 import com.est.munchy.utils.AppConstants
 
 @Entity(tableName = AppConstants.Companion.RECIPES_TABLE)
-class RecipeEntity (
+data class RecipeEntity (
     val recipe: MunchRecipe
 ) {
     @PrimaryKey(autoGenerate = true)

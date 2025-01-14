@@ -88,7 +88,9 @@ dependencies {
     implementation(libs.timber)
 
     // Room for Local Database
+    implementation (libs.androidx.room.ktx)
     implementation(libs.room.runtime)
+    kapt ("androidx.room:room-compiler:2.6.1")
 
     //Preference DataStore
     implementation(libs.androidx.datastore.preferences)
