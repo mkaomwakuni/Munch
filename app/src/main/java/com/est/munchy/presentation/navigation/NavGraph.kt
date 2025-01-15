@@ -37,7 +37,7 @@ fun NavGraph(navController: NavHostController) {
             MyCartScreen(navController)
         }
         composable(Routes.ProfileScreen.route) {
-           //ProfileScreen(navController)
+            MyCartScreen(navController)
         }
     }
 }

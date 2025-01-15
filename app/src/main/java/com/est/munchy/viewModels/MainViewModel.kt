@@ -14,6 +14,7 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.est.munchy.data.Repository
@@ -26,6 +27,7 @@ import com.est.munchy.utils.AppConstants.Companion.API_KEY
 import com.est.munchy.utils.NetworkResponse
 import com.est.munchy.viewModels.events.MainEvent
 import com.est.munchy.viewModels.states.MainUiState
+import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +51,7 @@ class MainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             repository.local.readRecipes().collect { recipes ->
-                _uiState.update { it.copy(recipes = recipes.flatMap {it.recipe.result}) }
+                _uiState.update { it.copy(recipes = recipes.flatMap {it.recipe.result ?: emptyList()}) }
             }
             repository.local.readBooked().collect { favorites ->
                 _uiState.update { it.copy(favoriteRecipes = favorites) }
@@ -128,6 +130,10 @@ class MainViewModel @Inject constructor(
             try {
                 val response = repository.remote.getRecipes(queries)
                 val result = handleFoodRecipesResponse(response)
+                // Add logging
+                Log.d("API_RESPONSE", "Response code: ${response.code()}")
+                Log.d("API_RESPONSE", "Response body: ${response.body()}")
+                Log.d("API_RESPONSE", "Response error: ${response.errorBody()?.string()}")
                 when (result) {
                     is NetworkResponse.SuccessResponse -> {
                         _uiState.update { it.copy(
@@ -231,17 +237,24 @@ class MainViewModel @Inject constructor(
             response.code() == 402 -> {
                 NetworkResponse.ErrorResponse("API Key Limited.")
             }
+            !response.isSuccessful -> {
+                NetworkResponse.ErrorResponse(response.message())
+            }
+            response.body() == null -> {
+                NetworkResponse.ErrorResponse("Empty response from server")
+            }
+            response.body()?.result == null -> {
+                NetworkResponse.ErrorResponse("No results found")
+            }
             response.body()?.result?.isEmpty() == true -> {
                 NetworkResponse.ErrorResponse("Recipes not found.")
             }
-            response.isSuccessful -> {
-                NetworkResponse.SuccessResponse(response.body()!!)
-            }
             else -> {
-                NetworkResponse.ErrorResponse(response.message())
+                NetworkResponse.SuccessResponse(response.body()!!)
             }
         }
     }
+
 
     private fun handleFoodJokeResponse(response: Response<FoodJokes>): NetworkResponse<FoodJokes> {
         return when {

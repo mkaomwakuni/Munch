@@ -102,7 +102,9 @@ dependencies {
     // Navigation
     implementation(libs.navigation.compose)
 
+    //Coil
     implementation(libs.coil.compose)
+
 
     // Gson
     implementation (libs.gson)
