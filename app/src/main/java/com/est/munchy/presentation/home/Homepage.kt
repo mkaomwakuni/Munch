@@ -1,5 +1,7 @@
 package com.est.munchy.presentation.home
 
+import android.R.attr.contentDescription
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -21,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.viewModels.MainViewModel
@@ -134,9 +136,12 @@ fun HomeScreen(
                     ) {
                         items(uiState.recipes) { recipe ->
                             RecipeCard(
-                                recipe = recipe,
+                                recipe = recipe.recipeId.let { recipe },
                                 onFavoriteClick = {
                                     mainViewModel.onEvent(MainEvent.AddToFavorites(recipe))
+                                },
+                                onItemClick = {
+                                    navController.navigate("recipe/${recipe.recipeId}")
                                 }
                             )
                         }
@@ -151,23 +156,33 @@ fun HomeScreen(
 @Composable
 fun RecipeCard(
     recipe: ModelResult,
-    onFavoriteClick: () -> Unit
+    onFavoriteClick: () -> Unit,
+    onItemClick: () -> Unit
 ) {
+    // Debug log to verify the image URL
+    Log.d("RecipeCard", "Recipe image URL: ${recipe.image}")
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp),
-        onClick = { /* Navigate to recipe details */ }
+        onClick = onItemClick
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Recipe Image
             AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(recipe.image.firstOrNull())
-                    .build(),
+                model = recipe.image,
                 contentDescription = "Image",
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.FillBounds
+                contentScale = ContentScale.FillBounds,
+                onLoading = {
+                    Log.d("RecipeCard", "Loading image: ${recipe.image}")
+                },
+                onSuccess = {
+                    Log.d("RecipeCard", "Successfully loaded image: ${recipe.image}")
+                },
+                onError = {
+                    Log.e("RecipeCard", "Error loading image: ${recipe.image}", it.result.throwable)
+                }
             )
 
             // Overlay gradient and content

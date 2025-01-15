@@ -58,6 +58,7 @@ import com.est.munchy.presentation.navigation.BottomNavigation
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuScreen(navController: NavController) {
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(

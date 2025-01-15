@@ -1,15 +1,5 @@
 package com.est.munchy.viewModels
 
-import com.est.munchy.utils.AppConstants.Companion.DEFAULT_DIET_TYPE
-import com.est.munchy.utils.AppConstants.Companion.DEFAULT_MEAL_TYPE
-import com.est.munchy.utils.AppConstants.Companion.DEFAULT_RECIPES_NUMBER
-import com.est.munchy.utils.AppConstants.Companion.QUERY_ADD_RECIPE_INFORMATION
-import com.est.munchy.utils.AppConstants.Companion.QUERY_API_KEY
-import com.est.munchy.utils.AppConstants.Companion.QUERY_DIET
-import com.est.munchy.utils.AppConstants.Companion.QUERY_FILL_INGREDIENTS
-import com.est.munchy.utils.AppConstants.Companion.QUERY_NUMBER
-import com.est.munchy.utils.AppConstants.Companion.QUERY_SEARCH
-import com.est.munchy.utils.AppConstants.Companion.QUERY_TYPE
 import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
@@ -24,10 +14,19 @@ import com.est.munchy.data.database.local.entities.RecipeEntity
 import com.est.munchy.domain.model.FoodJokes
 import com.est.munchy.domain.model.MunchRecipe
 import com.est.munchy.utils.AppConstants.Companion.API_KEY
+import com.est.munchy.utils.AppConstants.Companion.DEFAULT_DIET_TYPE
+import com.est.munchy.utils.AppConstants.Companion.DEFAULT_MEAL_TYPE
+import com.est.munchy.utils.AppConstants.Companion.DEFAULT_RECIPES_NUMBER
+import com.est.munchy.utils.AppConstants.Companion.QUERY_ADD_RECIPE_INFORMATION
+import com.est.munchy.utils.AppConstants.Companion.QUERY_API_KEY
+import com.est.munchy.utils.AppConstants.Companion.QUERY_DIET
+import com.est.munchy.utils.AppConstants.Companion.QUERY_FILL_INGREDIENTS
+import com.est.munchy.utils.AppConstants.Companion.QUERY_NUMBER
+import com.est.munchy.utils.AppConstants.Companion.QUERY_SEARCH
+import com.est.munchy.utils.AppConstants.Companion.QUERY_TYPE
 import com.est.munchy.utils.NetworkResponse
 import com.est.munchy.viewModels.events.MainEvent
 import com.est.munchy.viewModels.states.MainUiState
-import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,7 +36,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import javax.inject.Inject
-import kotlin.collections.firstOrNull
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -140,6 +138,7 @@ class MainViewModel @Inject constructor(
                             recipes = result.data?.result ?: emptyList(),
                             isLoading = false,
                             error = null
+
                         ) }
                         // Cache the response
                         offlineCacheRecipes(result.data!!)

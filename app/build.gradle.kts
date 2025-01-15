@@ -103,7 +103,10 @@ dependencies {
     implementation(libs.navigation.compose)
 
     //Coil
-    implementation(libs.coil.compose)
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-gif:2.5.0")
+    implementation("io.coil-kt:coil-svg:2.5.0")
+
 
 
     // Gson
