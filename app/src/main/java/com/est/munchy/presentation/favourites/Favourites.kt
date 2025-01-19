@@ -117,31 +117,31 @@ fun FavouritesScreen(
 
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(
-                            items = favoritesRecipes,
-                            key = {
-                                recipe -> recipe
-                            }) { recipe ->
-                            FavoriteRecipeCard(
-                                recipe = recipe,
-                                onDeleteClick = {
-                                    scope.launch {
-                                        viewModel.onEvent(MainEvent.RemoveFromFavorites(recipe))
-                                        snackBarHostState.showSnackbar(
-                                            message = "Recipe Deleted",
-                                            actionLabel = "Undo",
-                                            duration = SnackbarDuration.Short
-                                        ).let { result ->
-                                            if (result == SnackbarResult.ActionPerformed){
-                                                viewModel.onEvent(MainEvent.AddToFavorites(recipe))
-                                            }
-                                        }
-                                    }
-                                },
-                                onRecipeClick = {
-                                    navController.navigate(Routes.RecipeScreen.route + "/${recipe}")
-                                }
-                            )
+//                        items(
+//                            items = favoritesRecipes,
+//                            key = {
+//                                recipe -> recipe
+//                            }) { recipe ->
+//                            FavoriteRecipeCard(
+//                                recipe = recipe,
+//                                onDeleteClick = {
+//                                    scope.launch {
+//                                        viewModel.onEvent(MainEvent.RemoveFromFavorites(recipe))
+//                                        snackBarHostState.showSnackbar(
+//                                            message = "Recipe Deleted",
+//                                            actionLabel = "Undo",
+//                                            duration = SnackbarDuration.Short
+//                                        ).let { result ->
+//                                            if (result == SnackbarResult.ActionPerformed){
+//                                                viewModel.onEvent(MainEvent.AddToFavorites(recipe))
+//                                            }
+//                                        }
+//                                    }
+//                                },
+//                                onRecipeClick = {
+//                                    navController.navigate(Routes.RecipeScreen.route + "/${recipe}")
+//                                }
+//                            )
                         }
                     }
                 }
@@ -174,7 +174,7 @@ fun FavouritesScreen(
             )
         }
     }
-}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FavoriteRecipeCard(

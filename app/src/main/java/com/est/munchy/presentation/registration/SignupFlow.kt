@@ -126,7 +126,7 @@ fun SignUpScreen(navController: NavController) {
                 Text("Have an account? ")
             }
             Spacer(modifier = Modifier.width(10.dp))
-            TextButton(onClick = {navController.navigate(route = Routes.MenuScreen.route)}) {
+            TextButton(onClick = {navController.navigate(route = Routes.HomeScreen.route)}) {
                 Text("Sign in", color = Color(0xFF4CAF50))
             }
         }

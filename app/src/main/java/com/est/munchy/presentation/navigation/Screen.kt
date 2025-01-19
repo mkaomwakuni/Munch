@@ -5,7 +5,7 @@ object ScreenConstants {
     const val SIGN_IN_SCREEN = "sign_in_screen"
     const val SIGN_UP_SCREEN = "sign_up_screen"
     const val HOME_SCREEN = "home_screen"
-    const val MENU_SCREEN = "menu_screen"
+    const val RECIPE_SCREEN = "recipe_screen"
     const val FAVOURITES_SCREEN = "favourites_screen"
     const val JOKE_SCREEN = "joke_screen"
 }

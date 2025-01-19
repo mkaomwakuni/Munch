@@ -1,12 +1,9 @@
 package com.est.munchy.presentation.detail
-import android.accessibilityservice.GestureDescription
+
 import android.annotation.SuppressLint
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
+import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.TextView
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +13,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,7 +28,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -47,6 +44,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,19 +55,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.input.key.Key.Companion.I
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import com.est.munchy.R
 import com.est.munchy.domain.model.Ingredients
@@ -76,16 +72,24 @@ import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.utils.AppConstants
 import com.est.munchy.viewModels.RecipeViewModel
-import java.nio.file.WatchEvent
+import com.est.munchy.viewModels.events.RecipesEvent
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
     navController: NavController,
-    recipeId: Int,
     viewModel: RecipeViewModel = hiltViewModel()
 ) {
-    var selectedTab by remember { mutableStateOf(0) }
+    val recipeId = remember { navController.currentBackStackEntry?.arguments?.getInt("recipeId") }
+    val recipeState = viewModel.uiState.collectAsState().value
+
+    // Fetch recipe details when the screen is launched
+    LaunchedEffect(recipeId) {
+        if (recipeId != null) {
+            viewModel.onEvent(RecipesEvent.RefreshRecipes)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -93,129 +97,119 @@ fun RecipeDetailScreen(
                 title = {
                     Text(
                         "Recipe Details",
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
-                    ) },
-                actions = {
-                    IconButton(onClick = { /* Handle notification */ }) {
-                        Icon(
-                            Icons.Outlined.Notifications,
-                            contentDescription = "Notifications"
-                        )
-                    }
-
+                    )
                 }
             )
         },
         bottomBar = { BottomNavigation(navController) }
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
-        ) {
-            Text(
-                "Our Recipes",
-                style = MaterialTheme.typography.titleMedium,
-
-                color = Color.Gray)
-            Text(
-                "Special For You",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF2E7D32)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            SearchBar(
-                value = "",
-                onValueChange = { },
-                placeholder = "Search Your Menus"
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            CategoryTabs()
+        when {
+            recipeState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            recipeState.error != null -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = recipeState.error,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
+            true -> {
+                Column(
+                    modifier = Modifier
+                        .padding(padding)
+                        .padding(16.dp)
+                ) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CategoryTabs(
+                         // Pass the recipe to CategoryTabs
+                        selectedTab = 0,
+                        onTabSelected = {
+                            viewModel.onEvent(RecipesEvent.RefreshRecipes)
+                        }
+                    )
+                }
+            }
         }
     }
 }
 
+
 @Composable
-fun SearchBar(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String = "Search on Munch") {
-    TextField(
-        value = "",
-        onValueChange = { },
-        placeholder = { Text(placeholder) },
-        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+fun CategoryTabs(
+    recipe: ModelResult? = null,
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit
+) {
+    val tabs = listOf("Overview", "Ingredients", "Instructions")
+    var selectedCategory by remember { mutableStateOf(tabs[selectedTab]) }
+
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray.copy(alpha = 0.2f), RoundedCornerShape(14.dp)),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-        )
-    )
-}
-
-
-
-@Composable
-fun CategoryTabs() {
-    val tabs = listOf("Overview", "Ingredients", "Instructions")
-    var selectedCategory by remember { mutableStateOf("Overview") }
-
-    ScrollableTabRow(
-        selectedTabIndex = tabs.indexOf(selectedCategory),
-        containerColor = Color.Transparent,
-        contentColor = Color(0xFF2E7D32),
-        edgePadding = 0.dp
+            .background(Color.Transparent),
+        horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         tabs.forEach { category ->
             Tab(
                 text = { Text(category) },
                 selected = category == selectedCategory,
-                onClick = { selectedCategory = category },
+                onClick = {
+                    selectedCategory = category
+                    onTabSelected(tabs.indexOf(category))
+                },
                 selectedContentColor = Color(0xFF2E7D32),
-                unselectedContentColor = Color.Gray
+                unselectedContentColor = Color.Gray,
+                modifier = Modifier.weight(1f) // Equal width for each tab
             )
         }
     }
-    when(selectedCategory) {
-        "Overview" -> OverviewSection()
-        "Ingredients" -> IngredientsSection(
-            ingredients = 
-        )
-        "Instructions" -> InstructionsSection()
+
+    when (selectedCategory) {
+        "Overview" -> OverviewSection(recipe)
+        "Ingredients" -> IngredientsSection(recipe?.extendedIngredients)
+        "Instructions" -> InstructionsSection(recipe?.sourceUrl.toString())
     }
 }
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun InstructionsSection(
-
+    sourceUrl: String
 ) {
-
     var isLoading by remember { mutableStateOf(true) }
     var hasError by remember { mutableStateOf(false) }
 
-    Column (modifier = Modifier.fillMaxSize()) {
-        Box(modifier = Modifier.fillMaxSize()){
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             AndroidView(
                 factory = { context ->
                     WebView(context).apply {
-                        webViewClient = object: WebViewClient() {
-                            override fun onPageFinished(
-                                view: WebView?, url: String?) {
+                        webViewClient = object : WebViewClient() {
+                            override fun onPageFinished(view: WebView?, url: String?) {
                                 super.onPageFinished(view, url)
+                                isLoading = false
                             }
 
                             override fun onReceivedError(
                                 view: WebView?,
                                 errorCode: Int,
                                 description: String?,
-                                faillingUrl: String?,
-
+                                failingUrl: String?
                             ) {
-                                super.onReceivedError(view, errorCode, description,faillingUrl)
+                                super.onReceivedError(view, errorCode, description, failingUrl)
                                 hasError = true
                                 isLoading = false
                             }
@@ -228,11 +222,11 @@ fun InstructionsSection(
                     }
                 },
                 modifier = Modifier.fillMaxSize(),
-                update = { webView->
-                    webView.loadUrl()
+                update = { webView ->
+                    webView.loadUrl(sourceUrl)
                 }
             )
-            if (isLoading){
+            if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -241,9 +235,11 @@ fun InstructionsSection(
                 )
             }
             if (hasError) {
-                Column(modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(14.dp)) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(14.dp)
+                ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Error",
@@ -275,10 +271,12 @@ fun InstructionsSection(
 @Composable
 fun IngredientsSection(ingredients: List<Ingredients>?) {
     if (ingredients == null) return
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         items(ingredients.size) {
             IngredientItem(ingredients = ingredients[it])
         }
@@ -287,15 +285,19 @@ fun IngredientsSection(ingredients: List<Ingredients>?) {
 
 @Composable
 fun IngredientItem(ingredients: Ingredients) {
-    Card (modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-        Row (modifier = Modifier
-            .fillMaxWidth()
-            .padding(10.dp),
-            verticalAlignment = Alignment.CenterVertically) {
-            //Image
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Image
             AsyncImage(
-                model = "${AppConstants.BASE_IMAGE_URL}${ingredients.image}}",
+                model = "${AppConstants.BASE_IMAGE_URL}${ingredients.image}",
                 contentDescription = null,
                 modifier = Modifier
                     .size(50.dp)
@@ -305,16 +307,17 @@ fun IngredientItem(ingredients: Ingredients) {
                 error = painterResource(id = R.drawable.ic_launcher_foreground)
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Column (modifier = Modifier.weight(1f)) {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = ingredients.name,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier = Modifier.height(4.dp))
-                Row (
+                Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    modifier = Modifier.fillMaxWidth()){
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text(
                         text = "${ingredients.amount} ${ingredients.unit}",
                         style = MaterialTheme.typography.bodyMedium
@@ -324,7 +327,6 @@ fun IngredientItem(ingredients: Ingredients) {
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
                     Text(
                         text = ingredients.consistency,
                         style = MaterialTheme.typography.bodyMedium,
@@ -344,10 +346,11 @@ fun IngredientItem(ingredients: Ingredients) {
 
 @Composable
 fun OverviewSection(recipe: ModelResult? = null) {
-    LazyColumn (
+    LazyColumn(
         modifier = Modifier
-        .fillMaxWidth()
-        .padding()) {
+            .fillMaxWidth()
+            .padding()
+    ) {
         item {
             Column(
                 modifier = Modifier
@@ -356,11 +359,19 @@ fun OverviewSection(recipe: ModelResult? = null) {
             ) {
                 AsyncImage(
                     model = recipe?.image,
-                    contentDescription = "Recipe Image",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentScale = ContentScale.Crop
+                    contentDescription = "Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds,
+                    onLoading = {
+                        Timber.tag("RecipeCard").d("Loading image: ${recipe?.image}")
+                    },
+                    onSuccess = {
+                        Timber.tag("RecipeCard").d("Successfully loaded image: ${recipe?.image}")
+                    },
+                    onError = {
+                        Timber.tag("RecipeCard")
+                            .e(it.result.throwable, "Error loading image: ${recipe?.image}")
+                    }
                 )
                 Text(
                     text = recipe?.title.toString(),
@@ -384,9 +395,13 @@ fun OverviewSection(recipe: ModelResult? = null) {
                     )
                 }
             }
-            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Add the LazyVerticalGrid as a separate item
+        item {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
+                modifier = Modifier.heightIn(max = 200.dp), // Constrain the height
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -433,14 +448,18 @@ fun OverviewSection(recipe: ModelResult? = null) {
                     )
                 }
             }
+        }
+
+        // Add the summary as a separate item
+        item {
             Spacer(modifier = Modifier.height(16.dp))
-            //Summary
             Text(
                 text = HtmlCompat.fromHtml(
                     recipe?.summary.toString(),
-                    HtmlCompat.FROM_HTML_MODE_COMPACT).toString()
-                ,
-                style = MaterialTheme.typography.bodyMedium
+                    HtmlCompat.FROM_HTML_MODE_COMPACT
+                ).toString(),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(16.dp)
             )
         }
     }
@@ -451,10 +470,11 @@ private fun RowItem(
     icon: ImageVector,
     value: String,
     label: String
-){
-    Row (
+) {
+    Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center){
+        horizontalArrangement = Arrangement.Center
+    ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
@@ -481,22 +501,23 @@ private fun DietaryTag(
     icon: ImageVector,
     text: String,
     isActive: Boolean
-){
-    Surface (
+) {
+    Surface(
         shape = RoundedCornerShape(8.dp),
-        color = if (isActive){
+        color = if (isActive) {
             MaterialTheme.colorScheme.primaryContainer
         } else {
             MaterialTheme.colorScheme.surfaceVariant
         }
-    ){
-        Row(modifier = Modifier
-            .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically) {
+    ) {
+        Row(
+            modifier = Modifier.padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
-                tint = if (isActive){
+                tint = if (isActive) {
                     MaterialTheme.colorScheme.onPrimary
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -507,7 +528,7 @@ private fun DietaryTag(
             Text(
                 text = text,
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (isActive){
+                color = if (isActive) {
                     MaterialTheme.colorScheme.onPrimary
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -515,11 +536,4 @@ private fun DietaryTag(
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun MenuScreenPreview() {
-    val navController = rememberNavController()
-    RecipeDetailScreen(navController = navController, recipeId = 1)
 }

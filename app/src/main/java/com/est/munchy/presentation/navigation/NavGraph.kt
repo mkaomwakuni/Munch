@@ -15,7 +15,9 @@ import com.est.munchy.presentation.registration.LoginScreen
 import com.est.munchy.presentation.registration.SignUpScreen
 
 @Composable
-fun NavGraph(navController: NavHostController) {
+fun NavGraph(
+    navController: NavHostController
+    ) {
     NavHost (
         navController = navController,
         startDestination = Routes.SignInScreen.route
@@ -29,15 +31,21 @@ fun NavGraph(navController: NavHostController) {
         composable(Routes.SignUpScreen.route) {
             SignUpScreen(navController)
         }
-        composable(Routes.RecipeScreen.route) {
+        composable(
+            route = Routes.RecipeScreen.route + "/{recipeId}",
+            arguments = listOf(navArgument("recipeId") { type = NavType.IntType })) { backStackEntry ->
+            val recipeId = backStackEntry.arguments?.getInt("recipeId")
+            //fetch the recipe details using recipeId from ViewModel
             RecipeDetailScreen(
-                navController,
-                recipeId = TODO(),
-                viewModel = TODO()
+                navController = navController
+
             )
         }
         composable(Routes.HomeScreen.route) {
-            HomeScreen(navController)
+            HomeScreen(
+                navController
+
+            )
         }
         composable(Routes.Favourites.route) {
             FavouritesScreen(navController)
@@ -45,13 +53,13 @@ fun NavGraph(navController: NavHostController) {
         composable(Routes.JokeScreen.route) {
             FoodJokeScreen(navController)
         }
-        composable(
-            route = "recipe/{recipeId}",
-            arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
-        )
-        { backStackEntry ->
-            val recipeId = backStackEntry.arguments?.getInt("recipeId")?: return@composable
-            RecipeDetailScreen(navController = navController, recipeId = recipeId)
-        }
+//        composable(
+//            route = "recipe/{recipeId}",
+//            arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
+//        )
+//        { backStackEntry ->
+//            val recipeId = backStackEntry.arguments?.getInt("recipeId")?: return@composable
+//            RecipeDetailScreen(navController = navController, recipeId = recipeId)
+//        }
     }
 }

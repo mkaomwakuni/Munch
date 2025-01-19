@@ -27,9 +27,11 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.presentation.navigation.BottomNavigation
+import com.est.munchy.presentation.navigation.Routes
 import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.RecipeViewModel
 import com.est.munchy.viewModels.events.MainEvent
+import timber.log.Timber
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -141,7 +143,7 @@ fun HomeScreen(
                                     mainViewModel.onEvent(MainEvent.AddToFavorites(recipe))
                                 },
                                 onItemClick = {
-                                    navController.navigate("recipe/${recipe.recipeId}")
+                                    navController.navigate("${Routes.RecipeScreen.route}/${recipe.recipeId}")
                                 }
                             )
                         }
@@ -175,13 +177,14 @@ fun RecipeCard(
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.FillBounds,
                 onLoading = {
-                    Log.d("RecipeCard", "Loading image: ${recipe.image}")
+                    Timber.tag("RecipeCard").d("Loading image: ${recipe.image}")
                 },
                 onSuccess = {
-                    Log.d("RecipeCard", "Successfully loaded image: ${recipe.image}")
+                    Timber.tag("RecipeCard").d("Successfully loaded image: ${recipe.image}")
                 },
                 onError = {
-                    Log.e("RecipeCard", "Error loading image: ${recipe.image}", it.result.throwable)
+                    Timber.tag("RecipeCard")
+                        .e(it.result.throwable, "Error loading image: ${recipe.image}")
                 }
             )
 

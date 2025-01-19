@@ -50,117 +50,117 @@ fun FoodJokeScreen(
     navController: NavController,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    var foodJoke by remember { mutableStateOf("No Food Joke") }
-    val foodJokeState = viewModel.uiState.collectAsState().value
-
-    // Fetch food joke on first composition
-    LaunchedEffect(Unit) {
-        viewModel.getFoodJoke(AppConstants.API_KEY)
-    }
-
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("Food Joke") },
-                actions = {
-                    IconButton(
-                        onClick = {
-                            val shareIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, foodJoke)
-                                type = "text/plain"
-                            }
-                            context.startActivity(Intent.createChooser(shareIntent, "Share Joke"))
-                        }
-                    ) {
-                        Icon(Icons.Default.Share, "Share Joke")
-                    }
-                }
-            )
-        },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            when (foodJokeState) {
-                else -> {
-                    LoadingState()
-                }
-            }
-
-            // Pull to refresh
-            val refreshState = rememberPullToRefreshState(
-                refreshing = foodJokeState is NetworkResponse.Loading,
-                onRefresh = {
-                    scope.launch {
-                        viewModel.getFoodJoke(AppConstants.API_KEY)
-                    }
-                }
-            )
-
-            Box(
-                modifier = Modifier.pullToRefresh(refreshState)
-            ) {
-                PullRefreshIndicato(
-                    refreshing = foodJokeState is NetworkResponse.Loading,
-                    state = refreshState,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun LoadingState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
-
-@Composable
-private fun JokeContent(joke: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .size(48.dp)
-                        .padding(bottom = 16.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-
-                Text(
-                    text = joke,
-                    style = MaterialTheme.typography.bodyLarge,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-    }
+//    val context = LocalContext.current
+//    val scope = rememberCoroutineScope()
+//    val snackbarHostState = remember { SnackbarHostState() }
+//
+//    var foodJoke by remember { mutableStateOf("No Food Joke") }
+//    val foodJokeState = viewModel.uiState.collectAsState().value
+//
+//    // Fetch food joke on first composition
+//    LaunchedEffect(Unit) {
+//        viewModel.getFoodJoke(AppConstants.API_KEY)
+//    }
+//
+//    Scaffold(
+//        topBar = {
+//            TopAppBar(
+//                title = { Text("Food Joke") },
+//                actions = {
+//                    IconButton(
+//                        onClick = {
+//                            val shareIntent = Intent().apply {
+//                                action = Intent.ACTION_SEND
+//                                putExtra(Intent.EXTRA_TEXT, foodJoke)
+//                                type = "text/plain"
+//                            }
+//                            context.startActivity(Intent.createChooser(shareIntent, "Share Joke"))
+//                        }
+//                    ) {
+//                        Icon(Icons.Default.Share, "Share Joke")
+//                    }
+//                }
+//            )
+//        },
+//        snackbarHost = { SnackbarHost(snackbarHostState) }
+//    ) { paddingValues ->
+//        Box(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(paddingValues)
+//        ) {
+//            when (foodJokeState) {
+//                else -> {
+//                    LoadingState()
+//                }
+//            }
+//
+//            // Pull to refresh
+//            val refreshState = rememberPullToRefreshState(
+//                refreshing = foodJokeState is NetworkResponse.Loading,
+//                onRefresh = {
+//                    scope.launch {
+//                        viewModel.getFoodJoke(AppConstants.API_KEY)
+//                    }
+//                }
+//            )
+//
+//            Box(
+//                modifier = Modifier.pullToRefresh(refreshState)
+//            ) {
+//                PullRefreshIndicato(
+//                    refreshing = foodJokeState is NetworkResponse.Loading,
+//                    state = refreshState,
+//                    modifier = Modifier.align(Alignment.TopCenter)
+//                )
+//            }
+//        }
+//    }
+//}
+//
+//@Composable
+//private fun LoadingState() {
+//    Box(
+//        modifier = Modifier.fillMaxSize(),
+//        contentAlignment = Alignment.Center
+//    ) {
+//        CircularProgressIndicator()
+//    }
+//}
+//
+//@Composable
+//private fun JokeContent(joke: String) {
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .padding(16.dp),
+//        horizontalAlignment = Alignment.CenterHorizontally,
+//        verticalArrangement = Arrangement.Center
+//    ) {
+//        Card(
+//            modifier = Modifier.fillMaxWidth(),
+//            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+//        ) {
+//            Column(
+//                modifier = Modifier.padding(16.dp)
+//            ) {
+//                Icon(
+//                    imageVector = Icons.Default.MoreVert,
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .align(Alignment.CenterHorizontally)
+//                        .size(48.dp)
+//                        .padding(bottom = 16.dp),
+//                    tint = MaterialTheme.colorScheme.primary
+//                )
+//
+//                Text(
+//                    text = joke,
+//                    style = MaterialTheme.typography.bodyLarge,
+//                    textAlign = TextAlign.Center,
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//            }
+//        }
+//    }
 }
