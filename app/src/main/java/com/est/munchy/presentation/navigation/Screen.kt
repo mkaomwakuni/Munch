@@ -7,5 +7,5 @@ object ScreenConstants {
     const val HOME_SCREEN = "home_screen"
     const val MENU_SCREEN = "menu_screen"
     const val FAVOURITES_SCREEN = "favourites_screen"
-    const val PROFILE_SCREEN = "profile_screen"
+    const val JOKE_SCREEN = "joke_screen"
 }

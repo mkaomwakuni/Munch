@@ -2,12 +2,14 @@ package com.est.munchy.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.est.munchy.presentation.cart.MyCartScreen
+import androidx.navigation.navArgument
+import com.est.munchy.presentation.detail.RecipeDetailScreen
+import com.est.munchy.presentation.favourites.FavouritesScreen
 import com.est.munchy.presentation.home.HomeScreen
-import com.est.munchy.presentation.menu.MenuScreen
-import com.est.munchy.presentation.onboarding.MunchSteamLayout
+import com.est.munchy.presentation.jokes.FoodJokeScreen
 import com.est.munchy.presentation.onboarding.OnboardStart
 import com.est.munchy.presentation.registration.LoginScreen
 import com.est.munchy.presentation.registration.SignUpScreen
@@ -27,17 +29,29 @@ fun NavGraph(navController: NavHostController) {
         composable(Routes.SignUpScreen.route) {
             SignUpScreen(navController)
         }
-        composable(Routes.MenuScreen.route) {
-            MenuScreen(navController)
+        composable(Routes.RecipeScreen.route) {
+            RecipeDetailScreen(
+                navController,
+                recipeId = TODO(),
+                viewModel = TODO()
+            )
         }
         composable(Routes.HomeScreen.route) {
             HomeScreen(navController)
         }
         composable(Routes.Favourites.route) {
-            MyCartScreen(navController)
+            FavouritesScreen(navController)
         }
-        composable(Routes.ProfileScreen.route) {
-            MyCartScreen(navController)
+        composable(Routes.JokeScreen.route) {
+            FoodJokeScreen(navController)
+        }
+        composable(
+            route = "recipe/{recipeId}",
+            arguments = listOf(navArgument("recipeId") { type = NavType.IntType })
+        )
+        { backStackEntry ->
+            val recipeId = backStackEntry.arguments?.getInt("recipeId")?: return@composable
+            RecipeDetailScreen(navController = navController, recipeId = recipeId)
         }
     }
 }

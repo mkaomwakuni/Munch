@@ -83,7 +83,7 @@ fun ItemDetailsBottomSheet(item: FoodItemData) {
                 ToppingSelector()
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { /* Handle add to cart */ },
+                    onClick = { /* Handle add to favourites */ },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF2E7D32))
                 ) {
