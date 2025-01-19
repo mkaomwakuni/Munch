@@ -38,7 +38,7 @@ fun CongratulationScreen(navController: NavController) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text("Congratulation!", style = MaterialTheme.typography.labelSmall)
-        Text("Your account is complete, please enjoy the best menu from us.",
+        Text("Your account is complete, please enjoy the best detail from us.",
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center)
         Spacer(modifier = Modifier.height(32.dp))

@@ -2,10 +2,6 @@ package com.est.munchy.presentation.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Icon
@@ -34,14 +30,14 @@ fun BottomNavigation(navController: NavController) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.FavoriteBorder, contentDescription = null) },
             label = { Text("Saved") },
-            selected = navController.currentDestination?.route == Routes.MenuScreen.route,
-            onClick = { navController.navigate(route = Routes.MenuScreen.route) }
+            selected = navController.currentDestination?.route == Routes.RecipeScreen.route,
+            onClick = { navController.navigate(route = Routes.RecipeScreen.route) }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
             label = { Text("Jokes") },
             selected = false,
-            onClick = { navController.navigate(route = Routes.ProfileScreen.route) }
+            onClick = { navController.navigate(route = Routes.JokeScreen.route) }
         )
     }
 }

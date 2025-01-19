@@ -90,7 +90,7 @@ class MainViewModel @Inject constructor(
             repository.local.insertRecipes(recipesEntity)
         }
 
-    private fun insertFavoriteRecipe(bookedRecipeEntity: BookedRecipeEntity) =
+    fun insertFavoriteRecipe(bookedRecipeEntity: BookedRecipeEntity) =
         viewModelScope.launch(Dispatchers.IO) {
             repository.local.insertBooked(bookedRecipeEntity)
         }
@@ -100,7 +100,7 @@ class MainViewModel @Inject constructor(
             repository.local.insertJokes(foodJokeEntity)
         }
 
-    private fun deleteFavoriteRecipe(bookedRecipeEntity: BookedRecipeEntity) =
+    fun deleteFavoriteRecipe(bookedRecipeEntity: BookedRecipeEntity) =
         viewModelScope.launch(Dispatchers.IO) {
             repository.local.deleteBookedRecipe(bookedRecipeEntity)
         }

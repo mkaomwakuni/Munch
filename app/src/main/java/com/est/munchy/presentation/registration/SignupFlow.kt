@@ -74,7 +74,7 @@ fun SignUpScreen(navController: NavController) {
             style = MaterialTheme.typography.titleLarge
         )
         Text(
-            "Create account and choose favorite menu",
+            "Create account and choose favorite detail",
             style = MaterialTheme.typography.bodyLarge)
 
         OutlinedTextField(

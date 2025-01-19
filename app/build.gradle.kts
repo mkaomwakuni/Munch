@@ -121,6 +121,9 @@ dependencies {
     // Jsoup
     implementation (libs.jsoup)
 
+    //Swipe
+    implementation ("com.google.accompanist:accompanist-swiperefresh:0.31.3-beta")
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

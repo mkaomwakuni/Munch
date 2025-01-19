@@ -27,7 +27,7 @@ import com.est.munchy.presentation.components.CommonButton
 fun OnboardStart(navController: NavController) {
     OnboardingScreen(
         title = "All your favourite Dishes",
-        subtitle = "Order your favourite menu with easy,\nOn demand delivery",
+        subtitle = "Order your favourite detail with easy,\nOn demand delivery",
         mainRes = R.drawable.plate,
         smallRes = List(4) { R.drawable.plate },
         currentPage = 1,
