@@ -93,26 +93,64 @@ class RecipeViewModel @Inject constructor(
             }
 
             is RecipesEvent.GetRecipeDetails -> {
-                        val selectedRecipe = uiState.value.recipes.find { it.recipeId == event.recipeId }
-                        _uiState.update { currentState ->
-                            currentState.copy(
-                                selectedRecipe = selectedRecipe,
-                                isLoading = false
-                            )
-                        }
+                getRecipeDetails(event.recipeId)
             }
         }
     }
     private fun getRecipeDetails(recipeId: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            repository.local.readRecipes().collect { recipes ->
-                val recipe = recipes.flatMap { it.recipe.result ?: emptyList() }
-                    .find { it.recipeId == recipeId }
+            try {
+                // First try to get from local database
+                repository.local.readRecipes().collect { recipes ->
+                    val recipe = recipes.flatMap { it.recipe.result ?: emptyList() }
+                        .find { it.recipeId == recipeId }
+
+                    if (recipe != null) {
+                        _uiState.update {
+                            it.copy(
+                                selectedRecipe = recipe,
+                                isLoading = false,
+                                error = null
+                            )
+                        }
+                    } else {
+                        // If not found locally, fetch from API
+                        val queries = mapOf("id" to recipeId.toString())
+                        val response = repository.remote.getRecipes(queries)
+                        if (response.isSuccessful && response.body() != null) {
+                            val fetchedRecipe = response.body()?.result?.find { it.recipeId == recipeId }
+                            if (fetchedRecipe != null) {
+                                _uiState.update {
+                                    it.copy(
+                                        selectedRecipe = fetchedRecipe,
+                                        isLoading = false,
+                                        error = null
+                                    )
+                                }
+                            } else {
+                                _uiState.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        error = "Recipe not found"
+                                    )
+                                }
+                            }
+                        } else {
+                            _uiState.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = "Failed to load recipe details"
+                                )
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
-                        selectedRecipe = recipe,
-                        isLoading = false
+                        isLoading = false,
+                        error = e.message ?: "An unexpected error occurred"
                     )
                 }
             }
