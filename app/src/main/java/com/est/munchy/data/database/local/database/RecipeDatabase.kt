@@ -8,6 +8,10 @@ import com.est.munchy.data.database.local.entities.BookedRecipeEntity
 import com.est.munchy.data.database.local.entities.FoodJokesEntity
 import com.est.munchy.data.database.local.entities.RecipeEntity
 
+/**
+ * Room database class for the Munch app.
+ * Defines the database schema and provides access to the DAO.
+ */
 @Database(
     entities = [
         RecipeEntity::class,
@@ -19,5 +23,10 @@ import com.est.munchy.data.database.local.entities.RecipeEntity
 )
 @TypeConverters(MunchTypeConverter::class)
 abstract class RecipeDatabase : RoomDatabase() {
+
+    /**
+     * Provides access to the MunchDao.
+     * @return An instance of the MunchDao.
+     */
     abstract fun munchDao(): MunchDao
 }

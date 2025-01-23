@@ -12,6 +12,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,11 +30,13 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.est.munchy.domain.model.ModelResult
+import com.est.munchy.presentation.components.RecipePreviewContent
 import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.presentation.navigation.Routes
 import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.RecipeViewModel
 import com.est.munchy.viewModels.events.MainEvent
+import okhttp3.Route
 import timber.log.Timber
 
 
@@ -42,9 +48,30 @@ fun HomeScreen(
     recipesViewModel: RecipeViewModel = hiltViewModel()
 ) {
     val uiState = mainViewModel.uiState.collectAsState().value
+    var selectedRecipe by remember { mutableStateOf<ModelResult?>(null) }
+    val modalSheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         mainViewModel.onEvent(MainEvent.RefreshRecipes)
+    }
+
+    if (showBottomSheet && selectedRecipe != null){
+        ModalBottomSheet(
+            onDismissRequest = {
+                showBottomSheet = false
+                selectedRecipe = null
+            },
+            sheetState = modalSheetState
+        ) {
+            RecipePreviewContent(
+                recipe = selectedRecipe!!,
+                onViewFullRecipe = {
+                    showBottomSheet = false
+                    navController.navigate(Routes.RecipeScreen.route + "/${selectedRecipe!!.recipeId}")
+                }
+            )
+        }
     }
 
     Scaffold(
@@ -144,6 +171,8 @@ fun HomeScreen(
                                 },
                                 onItemClick = {
                                     navController.navigate("${Routes.RecipeScreen.route}/${recipe.recipeId}")
+                                    showBottomSheet = true
+                                    Timber.tag("Recipe").d("Navigating with recipe: $recipe")
                                 }
                             )
                         }
@@ -162,7 +191,7 @@ fun RecipeCard(
     onItemClick: () -> Unit
 ) {
     // Debug log to verify the image URL
-    Log.d("RecipeCard", "Recipe image URL: ${recipe.image}")
+    Timber.tag("RecipeCard").d("Recipe image URL: ${recipe.image}")
     Card(
         modifier = Modifier
             .fillMaxWidth()

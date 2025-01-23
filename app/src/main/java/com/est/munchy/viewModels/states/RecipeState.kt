@@ -16,5 +16,6 @@ data class RecipesUiState(
     ),
     val isOnline: Boolean = true,
     val wasOffline: Boolean = false,
-    val searchQuery: String = ""
+    val searchQuery: String = "",
+    val selectedRecipe: ModelResult? = null,
 )

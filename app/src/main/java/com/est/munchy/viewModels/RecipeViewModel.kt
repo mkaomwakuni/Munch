@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.est.munchy.data.DataStoreRepository
+import com.est.munchy.data.Repository
 import com.est.munchy.utils.NetworkChecker
 import com.est.munchy.viewModels.events.RecipesEvent
 import com.est.munchy.viewModels.states.RecipesUiState
@@ -27,6 +28,7 @@ import javax.inject.Inject
 class RecipeViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository,
     private val networkChecker: NetworkChecker,
+    private val repository: Repository,
     application: Application
 ) : AndroidViewModel(application) {
 
@@ -84,10 +86,35 @@ class RecipeViewModel @Inject constructor(
                 _uiState.update { it.copy(searchQuery = event.query) }
             }
             is RecipesEvent.RefreshRecipes -> {
-                // Refresh logic will be handled by MainViewModel
+
             }
             RecipesEvent.ClearSearch -> {
                 _uiState.update { it.copy(searchQuery = "") }
+            }
+
+            is RecipesEvent.GetRecipeDetails -> {
+                        val selectedRecipe = uiState.value.recipes.find { it.recipeId == event.recipeId }
+                        _uiState.update { currentState ->
+                            currentState.copy(
+                                selectedRecipe = selectedRecipe,
+                                isLoading = false
+                            )
+                        }
+            }
+        }
+    }
+    private fun getRecipeDetails(recipeId: Int) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            repository.local.readRecipes().collect { recipes ->
+                val recipe = recipes.flatMap { it.recipe.result ?: emptyList() }
+                    .find { it.recipeId == recipeId }
+                _uiState.update {
+                    it.copy(
+                        selectedRecipe = recipe,
+                        isLoading = false
+                    )
+                }
             }
         }
     }

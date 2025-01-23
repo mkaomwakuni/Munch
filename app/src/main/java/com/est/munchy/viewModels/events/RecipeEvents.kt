@@ -13,6 +13,7 @@ sealed class RecipesEvent {
     object RefreshRecipes : RecipesEvent()
     data class SearchRecipes(val query: String) : RecipesEvent()
     object ClearSearch : RecipesEvent()
+    data class GetRecipeDetails(val recipeId: Int) : RecipesEvent()
 }
 
 sealed class MainEvent {

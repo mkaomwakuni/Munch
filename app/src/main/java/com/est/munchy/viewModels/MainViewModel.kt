@@ -12,6 +12,7 @@ import com.est.munchy.data.database.local.entities.BookedRecipeEntity
 import com.est.munchy.data.database.local.entities.FoodJokesEntity
 import com.est.munchy.data.database.local.entities.RecipeEntity
 import com.est.munchy.domain.model.FoodJokes
+import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.domain.model.MunchRecipe
 import com.est.munchy.utils.AppConstants.Companion.API_KEY
 import com.est.munchy.utils.AppConstants.Companion.DEFAULT_DIET_TYPE
@@ -305,5 +306,10 @@ class MainViewModel @Inject constructor(
             QUERY_ADD_RECIPE_INFORMATION to "true",
             QUERY_FILL_INGREDIENTS to "true"
         )
+    }
+    fun getRecipeById(recipeId: Int): ModelResult? {
+        return uiState.value.recipes.find {
+            it.recipeId == recipeId
+        }
     }
 }

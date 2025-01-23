@@ -1,7 +1,6 @@
 package com.est.munchy.presentation.detail
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.background
@@ -25,8 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -34,15 +31,11 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -63,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.est.munchy.R
@@ -78,17 +70,17 @@ import timber.log.Timber
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
+    recipeId: Int,
     navController: NavController,
-    viewModel: RecipeViewModel = hiltViewModel()
+    viewModel: RecipeViewModel
 ) {
-    val recipeId = remember { navController.currentBackStackEntry?.arguments?.getInt("recipeId") }
-    val recipeState = viewModel.uiState.collectAsState().value
+    val recipeState by viewModel.uiState.collectAsState()
+    val selectedRecipe = recipeState.selectedRecipe
 
-    // Fetch recipe details when the screen is launched
-    LaunchedEffect(recipeId) {
-        if (recipeId != null) {
-            viewModel.onEvent(RecipesEvent.RefreshRecipes)
-        }
+    // Log when the screen is launched and recipeId is received
+    LaunchedEffect(selectedRecipe) {
+        Timber.tag("RecipeDetailScreen").d("LaunchedEffect triggered with recipeId: $recipeId")
+        viewModel.onEvent(RecipesEvent.GetRecipeDetails(recipeId))
     }
 
     Scaffold(
@@ -107,6 +99,7 @@ fun RecipeDetailScreen(
     ) { padding ->
         when {
             recipeState.isLoading -> {
+                Timber.tag("RecipeDetailScreen").d("Loading state is true")
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -115,18 +108,20 @@ fun RecipeDetailScreen(
                 }
             }
             recipeState.error != null -> {
+                Timber.tag("RecipeDetailScreen").d("Error encountered: ${recipeState.error}")
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = recipeState.error,
+                        text = recipeState.error!!,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }
             }
             true -> {
+                Timber.tag("RecipeDetailScreen").d("Recipe details loaded successfully")
                 Column(
                     modifier = Modifier
                         .padding(padding)
@@ -134,9 +129,10 @@ fun RecipeDetailScreen(
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
                     CategoryTabs(
-                         // Pass the recipe to CategoryTabs
+                        // Pass the recipe to CategoryTabs
                         selectedTab = 0,
                         onTabSelected = {
+                            Timber.tag("RecipeDetailScreen").d("Tab selected: $it")
                             viewModel.onEvent(RecipesEvent.RefreshRecipes)
                         }
                     )
@@ -145,6 +141,7 @@ fun RecipeDetailScreen(
         }
     }
 }
+
 
 
 @Composable
@@ -360,7 +357,9 @@ fun OverviewSection(recipe: ModelResult? = null) {
                 AsyncImage(
                     model = recipe?.image,
                     contentDescription = "Image",
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
+                        .height(200.dp),
+                    placeholder = painterResource(id = R.drawable.plate),
                     contentScale = ContentScale.FillBounds,
                     onLoading = {
                         Timber.tag("RecipeCard").d("Loading image: ${recipe?.image}")
