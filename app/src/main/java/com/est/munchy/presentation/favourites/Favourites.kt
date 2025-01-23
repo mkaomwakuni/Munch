@@ -49,6 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.est.munchy.domain.model.ModelResult
+import com.est.munchy.presentation.home.RecipeCard
 import com.est.munchy.presentation.navigation.Routes
 import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.events.MainEvent
@@ -117,31 +118,31 @@ fun FavouritesScreen(
 
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-//                        items(
-//                            items = favoritesRecipes,
-//                            key = {
-//                                recipe -> recipe
-//                            }) { recipe ->
-//                            FavoriteRecipeCard(
-//                                recipe = recipe,
-//                                onDeleteClick = {
-//                                    scope.launch {
-//                                        viewModel.onEvent(MainEvent.RemoveFromFavorites(recipe))
-//                                        snackBarHostState.showSnackbar(
-//                                            message = "Recipe Deleted",
-//                                            actionLabel = "Undo",
-//                                            duration = SnackbarDuration.Short
-//                                        ).let { result ->
-//                                            if (result == SnackbarResult.ActionPerformed){
-//                                                viewModel.onEvent(MainEvent.AddToFavorites(recipe))
-//                                            }
-//                                        }
-//                                    }
-//                                },
-//                                onRecipeClick = {
-//                                    navController.navigate(Routes.RecipeScreen.route + "/${recipe}")
-//                                }
-//                            )
+                        items(
+                            items = favoritesRecipes,
+                            key = { recipe ->
+                                recipe
+                            }) { recipe ->
+                            RecipeCard(
+                                recipe = recipe,
+                                onDeleteClick = {
+                                    scope.launch {
+                                        viewModel.onEvent(MainEvent.RemoveFromFavorites(recipe))
+                                        snackBarHostState.showSnackbar(
+                                            message = "Recipe Deleted",
+                                            actionLabel = "Undo",
+                                            duration = SnackbarDuration.Short
+                                        ).let { result ->
+                                            if (result == SnackbarResult.ActionPerformed) {
+                                                viewModel.onEvent(MainEvent.AddToFavorites(recipe))
+                                            }
+                                        }
+                                    }
+                                },
+                                onRecipeClick = {
+                                    navController.navigate(Routes.RecipeScreen.route + "/${recipe}")
+                                }
+                            )
                         }
                     }
                 }
@@ -175,73 +176,74 @@ fun FavouritesScreen(
         }
     }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun FavoriteRecipeCard(
-    recipe: ModelResult,
-    onDeleteClick: () -> Unit,
-    onRecipeClick: () -> Unit
-) {
-    Card(
-        onClick = onRecipeClick,
-        modifier = Modifier.fillMaxWidth()
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    fun FavoriteRecipeCard(
+        recipe: ModelResult,
+        onDeleteClick: () -> Unit,
+        onRecipeClick: () -> Unit
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Card(
+            onClick = onRecipeClick,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            // Recipe Image
-            AsyncImage(
-                model = recipe.image,
-                contentDescription = recipe.title,
+            Row(
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
-            )
-
-            Spacer(modifier = Modifier.width(16.dp))
-
-            // Recipe Details
-            Column(
-                modifier = Modifier.weight(1f)
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = recipe.title,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                // Recipe Image
+                AsyncImage(
+                    model = recipe.image,
+                    contentDescription = recipe.title,
+                    modifier = Modifier
+                        .size(80.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.width(16.dp))
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+                // Recipe Details
+                Column(
+                    modifier = Modifier.weight(1f)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${recipe.readyInMinutes} min",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        text = recipe.title,
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+
+                    Spacer(modifier = Modifier.height(4.dp))
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${recipe.readyInMinutes} min",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                // Delete Button
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
-            }
-
-            // Delete Button
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error
-                )
             }
         }
     }
