@@ -107,8 +107,6 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.5.0")
     implementation("io.coil-kt:coil-svg:2.5.0")
 
-
-
     // Gson
     implementation (libs.gson)
 

@@ -30,8 +30,8 @@ fun BottomNavigation(navController: NavController) {
         NavigationBarItem(
             icon = { Icon(Icons.Default.FavoriteBorder, contentDescription = null) },
             label = { Text("Saved") },
-            selected = navController.currentDestination?.route == Routes.RecipeScreen.route,
-            onClick = { navController.navigate(route = Routes.RecipeScreen.route) }
+            selected = navController.currentDestination?.route == Routes.Favourites.route,
+            onClick = { navController.navigate(route = Routes.Favourites.route) }
         )
         NavigationBarItem(
             icon = { Icon(Icons.Outlined.Info, contentDescription = null) },
