@@ -19,6 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -42,6 +44,7 @@ fun RecipePreviewContent(
                 contentDescription = "Recipe Image",
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clip(RoundedCornerShape(bottomEnd = 10.dp, bottomStart = 10.dp))
                     .height(340.dp),
                 contentScale = ContentScale.Crop
             )
@@ -49,13 +52,13 @@ fun RecipePreviewContent(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp)
+                    .height(180.dp)
                     .align(Alignment.BottomStart)
                     .background(
-                        brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                        brush = Brush.verticalGradient(
                             colors = listOf(
-                                androidx.compose.ui.graphics.Color.Transparent,
-                                androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.7f),
+                                Color.Transparent,
+                                MaterialTheme.colorScheme.onPrimary.copy(alpha = 2f)
                             )
                         )
                     )
@@ -70,7 +73,6 @@ fun RecipePreviewContent(
                     text = recipe.title,
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = androidx.compose.ui.graphics.Color.White,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -82,13 +84,11 @@ fun RecipePreviewContent(
                     Text(
                         text = "Ready in ${recipe.readyInMinutes} mins",
                         style = MaterialTheme.typography.bodySmall,
-                        color = androidx.compose.ui.graphics.Color.White
                     )
                     Text(
                         text = "Liked by ${recipe.aggregateLikes} people",
                         style = MaterialTheme.typography.bodySmall,
-                        fontWeight = FontWeight.Bold,
-                        color = androidx.compose.ui.graphics.Color.White
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 Spacer(modifier = Modifier.height(4.dp))
@@ -96,12 +96,12 @@ fun RecipePreviewContent(
                     text = "Source: ${recipe.sourceName}",
                     style = MaterialTheme.typography.bodySmall,
                     fontWeight = FontWeight.Bold,
-                    color = androidx.compose.ui.graphics.Color.White
+                    color = Color.White
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         Button(
             modifier = Modifier

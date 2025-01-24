@@ -55,6 +55,7 @@ import coil.compose.AsyncImage
 import com.est.munchy.data.database.local.entities.BookedRecipeEntity
 import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.presentation.home.RecipeCard
+import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.presentation.navigation.Routes
 import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.events.MainEvent
@@ -91,6 +92,9 @@ fun FavouritesScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomNavigation(navController)
         },
         snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { paddingValues ->

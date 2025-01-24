@@ -13,6 +13,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.utils.AppConstants
 import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.events.MainEvent
@@ -51,6 +52,9 @@ fun FoodJokeScreen(
                     }
                 }
             )
+        },
+        bottomBar = {
+            BottomNavigation(navController)
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->

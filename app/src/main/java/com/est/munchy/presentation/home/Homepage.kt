@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
@@ -206,12 +207,12 @@ fun RecipeCard(
     onFavoriteClick: () -> Unit,
     onItemClick: () -> Unit
 ) {
-    // Debug log to verify the image URL
     Timber.tag("RecipeCard").d("Recipe image URL: ${recipe.image}")
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp),
+            .clip(RoundedCornerShape(0.dp))
+            .height(240.dp),
         onClick = onItemClick
     ) {
         Box(modifier = Modifier.fillMaxSize()) {

@@ -1,5 +1,7 @@
 package com.est.munchy.presentation.detail
 
+import android.R.id.tabs
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,8 +15,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -42,7 +46,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,10 +55,10 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.est.munchy.domain.model.Ingredients
 import com.est.munchy.domain.model.ModelResult
+import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.utils.AppConstants
 import com.est.munchy.utils.fetchInstructionsContent
 import com.est.munchy.viewModels.RecipeViewModel
-import com.est.munchy.viewModels.events.MainEvent
 import com.est.munchy.viewModels.events.RecipesEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,13 +118,19 @@ fun RecipeDetailScreen(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .align(Alignment.TopStart)
+                        .align(Alignment.BottomStart)
                         .padding(8.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f), shape = RoundedCornerShape(4.dp)
+                        )
+                        .wrapContentWidth()
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(20.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -134,7 +143,9 @@ fun RecipeDetailScreen(
                     Icon(
                         imageVector = Icons.Default.FavoriteBorder,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp),
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(20.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -341,27 +352,6 @@ fun InstructionsSection(sourceUrl: String) {
             text = content,
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.verticalScroll(rememberScrollState())
-        )
-    }
-}
-
-@Composable
-fun RowItem(
-    icon: ImageVector,
-    value: String,
-    label: String
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(icon, contentDescription = label)
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall
         )
     }
 }
