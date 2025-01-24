@@ -55,6 +55,7 @@ import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.utils.AppConstants
 import com.est.munchy.utils.fetchInstructionsContent
 import com.est.munchy.viewModels.RecipeViewModel
+import com.est.munchy.viewModels.events.MainEvent
 import com.est.munchy.viewModels.events.RecipesEvent
 
 @OptIn(ExperimentalMaterial3Api::class)

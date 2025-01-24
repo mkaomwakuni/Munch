@@ -5,8 +5,10 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.util.Log
+import androidx.datastore.dataStore
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.est.munchy.data.DataStoreRepository
 import com.est.munchy.data.Repository
 import com.est.munchy.data.database.local.entities.BookedRecipeEntity
 import com.est.munchy.data.database.local.entities.FoodJokesEntity
@@ -37,19 +39,18 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Response
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val repository: Repository,
+    private val dataStoreRepository: DataStoreRepository,
     application: Application
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
-
-    val bookedRecipes: StateFlow<List<BookedRecipeEntity>> = repository.local.readBooked()
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init {
         viewModelScope.launch {
@@ -64,6 +65,55 @@ class MainViewModel @Inject constructor(
                     _uiState.update { it.copy(foodJoke = joke.foodJoke) }
                 }
             }
+            dataStoreRepository.lastUpdateTime.collect { lastUpdateTime ->
+                checkForRecipeUpdates(lastUpdateTime)
+            }
+        }
+    }
+
+    private suspend fun checkForRecipeUpdates(lastUpdate: Long) {
+        val currentTime = System.currentTimeMillis()
+        val updateInterval = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
+
+        // Check if we need to update (more than 24 hours since last update)
+        if (currentTime - lastUpdate > updateInterval) {
+            if (hasInternetConnection()) {
+                try {
+                    // Fetch new recipes from API
+                    val response = repository.remote.getRecipes(applyQueries())
+                    when (val result = handleFoodRecipesResponse(response)) {
+                        is NetworkResponse.SuccessResponse -> {
+                            // Update local database with new recipes
+                            result.data?.let { recipe ->
+                                offlineCacheRecipes(recipe)
+                                // Save new update time
+                                dataStoreRepository.saveLastUpdateTime(currentTime)
+                            }
+                        }
+
+                        is NetworkResponse.ErrorResponse -> {
+                            _uiState.update { it.copy(error = result.message) }
+                        }
+
+                        is NetworkResponse.Loading -> {
+                            _uiState.update { it.copy(isLoading = true) }
+                        }
+                    }
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(error = "Error updating recipes: ${e.message}") }
+                }
+            }
+        }
+        repository.local.readRecipes().collect { recipes ->
+            _uiState.update { it.copy(
+                recipes = recipes.flatMap {it.recipe.result ?: emptyList()})
+            }
+        }
+    }
+
+    fun forceUpdateRefresh() {
+        viewModelScope.launch {
+            checkForRecipeUpdates(0L)
         }
     }
 
@@ -76,10 +126,29 @@ class MainViewModel @Inject constructor(
                 getRecipes(applyQueries())
             }
             is MainEvent.AddToFavorites -> {
-                insertFavoriteRecipe(BookedRecipeEntity(result = event.recipe))
+                viewModelScope.launch {
+                    try {
+                        val bookedRecipe = BookedRecipeEntity(result = event.recipe)
+                        repository.local.insertBooked(bookedRecipe)
+                        Timber.tag("MainViewModel")
+                            .d("Recipe saved to favorites: ${event.recipe.title}")
+                    } catch (e: Exception) {
+                        Timber.tag("MainViewModel").e("Error saving recipe: ${e.message}")
+                        _uiState.update { it.copy(error = "Failed to save recipe") }
+                    }
+                    insertFavoriteRecipe(BookedRecipeEntity(result = event.recipe))
+                }
             }
             is MainEvent.RemoveFromFavorites -> {
-                deleteFavoriteRecipe(event.recipe)
+                viewModelScope.launch(Dispatchers.IO) {
+                    try {
+                        repository.local.deleteBookedRecipe(event.recipe)
+                        Timber.tag("MainViewModel").d("Recipe removed from favorites: ${event.recipe.result.title}")
+                    } catch (e: Exception) {
+                        Log.e("MainViewModel", "Error removing recipe: ${e.message}")
+                        _uiState.update { it.copy(error = "Failed to remove recipe") }
+                    }
+                }
             }
             is MainEvent.GetFoodJoke -> {
                 getFoodJoke(API_KEY)
@@ -110,10 +179,17 @@ class MainViewModel @Inject constructor(
             repository.local.deleteBookedRecipe(bookedRecipeEntity)
         }
 
-    fun deleteAllFavoriteRecipes() =
+    fun deleteAllFavoriteRecipes() {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.local.deleteAllBooked()
+            try {
+                repository.local.deleteAllBooked()
+                Timber.tag("MainViewModel").d("All favorite recipes deleted")
+            } catch (e: Exception) {
+                Timber.tag("MainViewModel").e("Error deleting all recipes: ${e.message}")
+                _uiState.update { it.copy(error = "Failed to delete all recipes") }
+            }
         }
+    }
 
     private fun getRecipes(queries: Map<String, String>) = viewModelScope.launch {
         getRecipesSafeCall(queries)

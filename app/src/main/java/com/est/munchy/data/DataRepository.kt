@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.est.munchy.domain.model.MealAndDietType
@@ -40,9 +41,30 @@ class DataStoreRepository @Inject constructor(@ApplicationContext private val co
         val selectedDietType = stringPreferencesKey(PREFERENCES_DIET_TYPE)
         val selectedDietTypeId = intPreferencesKey(PREFERENCES_DIET_TYPE_ID)
         val backOnline = booleanPreferencesKey(PREFERENCES_BACK_ONLINE)
+        val lastRecipeUpdate = longPreferencesKey("last_recipe_update")
     }
 
     private val dataStore: DataStore<Preferences> = context.dataStore
+
+    suspend fun saveLastUpdateTime(timeStamp: Long) {
+        dataStore.edit {
+            preferences ->
+            preferences[PreferenceKeys.lastRecipeUpdate] = timeStamp
+        }
+    }
+
+    val lastUpdateTime : Flow<Long> = dataStore.data
+        .catch { exception ->
+            if (exception is IOException) {
+                emit(emptyPreferences())
+            } else {
+                throw exception
+            }
+        }
+        .map {
+            preferences ->
+            preferences[PreferenceKeys.lastRecipeUpdate] ?: 0L
+        }
 
     suspend fun saveMealAndDietType(
         mealType: String,
