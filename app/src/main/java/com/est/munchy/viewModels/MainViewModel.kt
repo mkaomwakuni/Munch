@@ -12,7 +12,6 @@ import com.est.munchy.data.database.local.entities.BookedRecipeEntity
 import com.est.munchy.data.database.local.entities.FoodJokesEntity
 import com.est.munchy.data.database.local.entities.RecipeEntity
 import com.est.munchy.domain.model.FoodJokes
-import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.domain.model.MunchRecipe
 import com.est.munchy.utils.AppConstants.Companion.API_KEY
 import com.est.munchy.utils.AppConstants.Companion.DEFAULT_DIET_TYPE
@@ -31,8 +30,10 @@ import com.est.munchy.viewModels.states.MainUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -46,6 +47,9 @@ class MainViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+
+    val bookedRecipes: StateFlow<List<BookedRecipeEntity>> = repository.local.readBooked()
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init {
         viewModelScope.launch {
@@ -306,10 +310,5 @@ class MainViewModel @Inject constructor(
             QUERY_ADD_RECIPE_INFORMATION to "true",
             QUERY_FILL_INGREDIENTS to "true"
         )
-    }
-    fun getRecipeById(recipeId: Int): ModelResult? {
-        return uiState.value.recipes.find {
-            it.recipeId == recipeId
-        }
     }
 }
