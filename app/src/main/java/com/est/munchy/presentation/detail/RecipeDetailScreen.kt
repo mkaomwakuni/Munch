@@ -1,6 +1,5 @@
 package com.est.munchy.presentation.detail
 
-import android.R.id.tabs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,7 +54,6 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.est.munchy.domain.model.Ingredients
 import com.est.munchy.domain.model.ModelResult
-import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.utils.AppConstants
 import com.est.munchy.utils.fetchInstructionsContent
 import com.est.munchy.viewModels.RecipeViewModel
