@@ -1,33 +1,80 @@
 package com.est.munchy.data.database.local.database
 
 import androidx.room.TypeConverter
+import com.est.munchy.domain.model.FoodJokes
+import com.est.munchy.domain.model.ModelResult
+import com.est.munchy.domain.model.MunchRecipe
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
+/**
+ * Type converter class for Room database.
+ * Handles conversion between complex data types and their string representations.
+ */
 class MunchTypeConverter {
 
-    val gson = Gson()
+    private val gson = Gson()
 
+    /**
+     * Converts a ModelResult object to a JSON string.
+     * @param modelResult The ModelResult object to convert.
+     * @return The JSON string representation of the ModelResult.
+     */
     @TypeConverter
-    fun foodRecipeToString(foodRecipe: MunchRecipe): String {
-        return gson.toJson(foodRecipe)
+    fun fromModelResult(modelResult: ModelResult): String {
+        return gson.toJson(modelResult)
     }
 
+    /**
+     * Converts a JSON string to a ModelResult object.
+     * @param json The JSON string to convert.
+     * @return The ModelResult object parsed from the JSON string.
+     */
     @TypeConverter
-    fun stringToFoodRecipe(data: String): MunchRecipe {
-        val listType = object : TypeToken<MunchRecipe>() {}.type
-        return gson.fromJson(data, listType)
+    fun toModelResult(json: String): ModelResult {
+        val type = object : TypeToken<ModelResult>() {}.type
+        return gson.fromJson(json, type)
     }
 
+    /**
+     * Converts a MunchRecipe object to a JSON string.
+     * @param munchRecipe The MunchRecipe object to convert.
+     * @return The JSON string representation of the MunchRecipe.
+     */
     @TypeConverter
-    fun resultToString(result: Result) : String {
-        return gson.toJson(result)
+    fun fromMunchRecipe(munchRecipe: MunchRecipe): String {
+        return gson.toJson(munchRecipe)
     }
 
+    /**
+     * Converts a JSON string to a MunchRecipe object.
+     * @param json The JSON string to convert.
+     * @return The MunchRecipe object parsed from the JSON string.
+     */
     @TypeConverter
-    fun stringToResult(data: String): Result {
-        val listType = object : TypeToken<Result>() {}.type
-        return gson.fromJson(data, listType)
+    fun toMunchRecipe(json: String): MunchRecipe {
+        val type = object : TypeToken<MunchRecipe>() {}.type
+        return gson.fromJson(json, type)
     }
 
+    /**
+     * Converts a FoodJokes object to a JSON string.
+     * @param foodJokes The FoodJokes object to convert.
+     * @return The JSON string representation of the FoodJokes.
+     */
+    @TypeConverter
+    fun fromFoodJokes(foodJokes: FoodJokes): String {
+        return gson.toJson(foodJokes)
+    }
+
+    /**
+     * Converts a JSON string to a FoodJokes object.
+     * @param json The JSON string to convert.
+     * @return The FoodJokes object parsed from the JSON string.
+     */
+    @TypeConverter
+    fun toFoodJokes(json: String): FoodJokes {
+        val type = object : TypeToken<FoodJokes>() {}.type
+        return gson.fromJson(json, type)
+    }
 }

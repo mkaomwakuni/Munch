@@ -1,43 +1,106 @@
 package com.est.munchy.presentation.home
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
+import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import com.est.munchy.domain.model.ModelResult
+import com.est.munchy.presentation.components.RecipePreviewContent
 import com.est.munchy.presentation.navigation.BottomNavigation
-import com.est.munchy.presentation.menu.DeliveryCard
-import com.est.munchy.presentation.menu.PromotionCard
-import com.est.munchy.presentation.menu.SearchBar
-import com.est.munchy.presentation.menu.TopOfWeekItems
+import com.est.munchy.presentation.navigation.Routes
+import com.est.munchy.viewModels.MainViewModel
+import com.est.munchy.viewModels.RecipeViewModel
+import com.est.munchy.viewModels.events.MainEvent
+import timber.log.Timber
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
+    mainViewModel: MainViewModel = hiltViewModel(),
+    recipesViewModel: RecipeViewModel = hiltViewModel()
 ) {
+    val uiState = mainViewModel.uiState.collectAsState().value
+    var selectedRecipe by remember { mutableStateOf<ModelResult?>(null) }
+    val modalSheetState = rememberModalBottomSheetState()
+    var showBottomSheet by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        mainViewModel.onEvent(MainEvent.RefreshRecipes)
+    }
+
+    if (showBottomSheet && selectedRecipe != null){
+        ModalBottomSheet(
+            dragHandle = null,
+            onDismissRequest = {
+                showBottomSheet = false
+                selectedRecipe = null
+            },
+            sheetState = modalSheetState
+        ) {
+            RecipePreviewContent(
+                recipe = selectedRecipe!!,
+                onViewFullRecipe = {
+                    showBottomSheet = false
+                    navController.navigate(Routes.RecipeScreen.route + "/${selectedRecipe!!.recipeId}")
+                }
+            )
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(
-                    "Home",
-                    fontWeight = FontWeight.Bold)
-                        },
+                title = {
+                    Text(
+                        "Munch",
+                        fontWeight = FontWeight.Bold
+                    )
+                },
                 actions = {
                     IconButton(onClick = { /* Handle notification */ }) {
                         Icon(
@@ -48,29 +111,203 @@ fun HomeScreen(
                 }
             )
         },
-        bottomBar = { BottomNavigation(navController) }
+        bottomBar = { BottomNavigation(navController) },
+        contentWindowInsets = WindowInsets(0)
     ) { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            SearchBar()
+            // Welcome Text
+            Text(
+                "Find Best Recipe",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF2E7D32)
+            )
+            Text(
+                "For Your Cooking",
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.Gray
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
-            DeliveryCard()
+
+            // Search Bar
+            SearchBar(
+                value = uiState.searchQuery,
+                onValueChange = { query ->
+                    mainViewModel.onEvent(MainEvent.SearchRecipes(query))
+                },
+                placeholder = "Search recipes..."
+            )
+
             Spacer(modifier = Modifier.height(16.dp))
-            PromotionCard()
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Top of Week", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(8.dp))
-            TopOfWeekItems()
+
+            // Content
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+                uiState.error != null -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = uiState.error,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+                uiState.recipes.isEmpty() -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No recipes found",
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+                else -> {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(uiState.recipes) { recipe ->
+
+                            RecipeCard(
+                                recipe = recipe.recipeId.let { recipe },
+                                onFavoriteClick = {
+                                    mainViewModel.onEvent(MainEvent.AddToFavorites(recipe))
+                                    Timber.tag("Recipe").d("Adding to favorites: $recipe")
+                                },
+                                onItemClick = {
+                                    selectedRecipe = recipe
+                                    showBottomSheet = true
+                                    Timber.tag("Recipe").d("Navigating with recipe: $recipe")
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-@Preview
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreenPreview() {
-    val navController = rememberNavController()
-    HomeScreen(navController)
+fun RecipeCard(
+    recipe: ModelResult,
+    onFavoriteClick: () -> Unit,
+    onItemClick: () -> Unit
+) {
+    Timber.tag("RecipeCard").d("Recipe image URL: ${recipe.image}")
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(0.dp))
+            .height(240.dp),
+        onClick = onItemClick
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Recipe Image
+            AsyncImage(
+                model = recipe.image,
+                contentDescription = "Image",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.FillBounds,
+                onLoading = {
+                    Timber.tag("RecipeCard").d("Loading image: ${recipe.image}")
+                },
+                onSuccess = {
+                    Timber.tag("RecipeCard").d("Successfully loaded image: ${recipe.image}")
+                },
+                onError = {
+                    Timber.tag("RecipeCard")
+                        .e(it.result.throwable, "Error loading image: ${recipe.image}")
+                }
+            )
+
+            // Overlay gradient and content
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Recipe Title
+                Text(
+                    text = recipe.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+
+                // Recipe Info
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Recipe details
+                    Column {
+                        Text(
+                            text = "${recipe.readyInMinutes} mins",
+                            color = Color.White,
+                            fontSize = 14.sp
+                        )
+                        if (recipe.sourceName != null) {
+                            Text(
+                                text = "By ${recipe.sourceName}",
+                                color = Color.White,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+
+                    // Favorite button
+                    IconButton(
+                        onClick = onFavoriteClick
+                    ) {
+                        Icon(
+                            Icons.Outlined.FavoriteBorder, // Replace with appropriate favorite icon
+                            contentDescription = "Add to favorites",
+                            tint = Color.White
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchBar(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = { Text(placeholder) },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+        ),
+        singleLine = true
+    )
 }

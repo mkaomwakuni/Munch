@@ -4,26 +4,28 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
 
 
-class NetworkChecker: ConnectivityManager.NetworkCallback() {
+class NetworkChecker @Inject constructor(
+    private val context: Context
+) : ConnectivityManager.NetworkCallback() {
 
-    private  val isNetworkAvailable = MutableStateFlow(false)
+    private val isNetworkAvailable = MutableStateFlow(false)
 
-    //Implement checking activity
-    fun NetworkAvailabilityChecker(context: Context) : MutableStateFlow<Boolean> {
-
-        val connectivityManager =  context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    fun getNetworkAvailability(): MutableStateFlow<Boolean> {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         connectivityManager.registerDefaultNetworkCallback(this)
 
         val network = connectivityManager.activeNetwork
-        if (network==null){
+        if (network == null) {
             isNetworkAvailable.value = false
             return isNetworkAvailable
         }
 
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
-        if (networkCapabilities==null){
+        if (networkCapabilities == null) {
             isNetworkAvailable.value = false
             return isNetworkAvailable
         }
@@ -42,5 +44,5 @@ class NetworkChecker: ConnectivityManager.NetworkCallback() {
                 isNetworkAvailable
             }
         }
-        }
+    }
 }
