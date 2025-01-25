@@ -55,7 +55,7 @@ fun RecipePreviewContent(
                         brush = Brush.verticalGradient(
                             colors = listOf(
                                 Color.Transparent,
-                                MaterialTheme.colorScheme.onPrimary.copy(alpha = 2f)
+                                MaterialTheme.colorScheme.background
                             )
                         )
                     )

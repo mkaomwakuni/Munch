@@ -50,10 +50,10 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.presentation.navigation.BottomNavigation
+import com.est.munchy.presentation.navigation.Routes
 import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.events.MainEvent
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,7 +61,7 @@ fun FavouritesScreen(
     navController: NavController,
     viewModel: MainViewModel = hiltViewModel()
 ) {
-    val favoritesRecipes = viewModel.uiState.collectAsState().value.favoriteRecipes // Ensure this is a List<ModelResult>
+    val favoritesRecipes = viewModel.uiState.collectAsState().value.favoriteRecipes
     var showDeleteDialog by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -137,13 +137,13 @@ fun FavouritesScreen(
                                             duration = SnackbarDuration.Short
                                         ).let { result ->
                                             if (result == SnackbarResult.ActionPerformed) {
-                                             //   viewModel.onEvent(MainEvent.AddToFavorites(recipe))
+                                                viewModel.onEvent(MainEvent.AddToFavorites(recipe.result))
                                             }
                                         }
                                     }
                                 },
                                 onRecipeClick = {
-                                //    navController.navigate(Routes.RecipeScreen.route + "/${"/${recipe.result.id}"}")}"
+                                    navController.navigate(Routes.RecipeScreen.route + "/${"/${recipe.result.recipeId}"}")
                                 }
                             )
                         }
@@ -162,7 +162,9 @@ fun FavouritesScreen(
                     TextButton(
                         onClick = {
                             scope.launch {
-                                viewModel.deleteAllFavoriteRecipes()
+                                favoritesRecipes.forEach { recipe ->
+                                    viewModel.onEvent(MainEvent.RemoveFromFavorites(recipe))
+                                }
                                 snackBarHostState.showSnackbar("All recipes removed")
                             }
                             showDeleteDialog = false
@@ -190,12 +192,14 @@ fun FavoriteRecipeCard(
 ) {
     Card(
         onClick = onRecipeClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .padding(8.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Recipe Image
@@ -203,12 +207,12 @@ fun FavoriteRecipeCard(
                 model = recipe.image,
                 contentDescription = recipe.title,
                 modifier = Modifier
-                    .size(80.dp)
+                    .size(120.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             // Recipe Details
             Column(
@@ -218,36 +222,33 @@ fun FavoriteRecipeCard(
                     text = recipe.title,
                     style = MaterialTheme.typography.titleSmall,
                     maxLines = 2,
+                    fontWeight = FontWeight.Bold,
                     overflow = TextOverflow.Ellipsis
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
-
+                Text(
+                    text = recipe.summary,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(1.dp),
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${recipe.readyInMinutes} min",
+                        text = "${recipe.readyInMinutes} min, Preparation Time",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            }
-
-            // Delete Button
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = MaterialTheme.colorScheme.error
-                )
             }
         }
     }

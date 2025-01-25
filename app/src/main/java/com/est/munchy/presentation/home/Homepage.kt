@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -110,7 +111,8 @@ fun HomeScreen(
                 }
             )
         },
-        bottomBar = { BottomNavigation(navController) }
+        bottomBar = { BottomNavigation(navController) },
+        contentWindowInsets = WindowInsets(0)
     ) { padding ->
         Column(
             modifier = Modifier
@@ -181,10 +183,12 @@ fun HomeScreen(
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         items(uiState.recipes) { recipe ->
+
                             RecipeCard(
                                 recipe = recipe.recipeId.let { recipe },
                                 onFavoriteClick = {
                                     mainViewModel.onEvent(MainEvent.AddToFavorites(recipe))
+                                    Timber.tag("Recipe").d("Adding to favorites: $recipe")
                                 },
                                 onItemClick = {
                                     selectedRecipe = recipe
