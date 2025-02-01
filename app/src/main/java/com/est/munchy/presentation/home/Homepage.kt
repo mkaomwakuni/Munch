@@ -1,5 +1,6 @@
 package com.est.munchy.presentation.home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -57,17 +58,26 @@ import com.est.munchy.viewModels.events.MainEvent
 import timber.log.Timber
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
     mainViewModel: MainViewModel = hiltViewModel(),
     recipesViewModel: RecipeViewModel = hiltViewModel()
 ) {
-    val uiState = mainViewModel.uiState.collectAsState().value
+    // Collect the UI state from the ViewModel
+    val uiState by mainViewModel.uiState.collectAsState()
+    // State hoisting for selected recipe and bottom sheet
     var selectedRecipe by remember { mutableStateOf<ModelResult?>(null) }
     val modalSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
+
+    // Filter recipes based on the UI state
+    val filteredRecipes = remember ( uiState.recipes ) {
+        uiState.recipes.filter {
+            it.title.isNotEmpty()
+        }
+    }
 
     LaunchedEffect(Unit) {
         mainViewModel.onEvent(MainEvent.RefreshRecipes)
@@ -161,13 +171,13 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = uiState.error,
+                            text = uiState.error!!,
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
-                uiState.recipes.isEmpty() -> {
+                filteredRecipes.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -180,9 +190,11 @@ fun HomeScreen(
                 }
                 else -> {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(uiState.recipes) { recipe ->
+                        items(
+                            items = filteredRecipes,
+                            key = {it.recipeId}) { recipe ->
 
                             RecipeCard(
                                 recipe = recipe.recipeId.let { recipe },
@@ -194,8 +206,8 @@ fun HomeScreen(
                                     selectedRecipe = recipe
                                     showBottomSheet = true
                                     Timber.tag("Recipe").d("Navigating with recipe: $recipe")
-                                }
-                            )
+                                },
+                                modifier = Modifier.animateItem())
                         }
                     }
                 }
@@ -207,6 +219,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeCard(
+    modifier: Modifier = Modifier,
     recipe: ModelResult,
     onFavoriteClick: () -> Unit,
     onItemClick: () -> Unit
