@@ -25,9 +25,11 @@ import com.est.munchy.utils.AppConstants.Companion.QUERY_FILL_INGREDIENTS
 import com.est.munchy.utils.AppConstants.Companion.QUERY_NUMBER
 import com.est.munchy.utils.AppConstants.Companion.QUERY_SEARCH
 import com.est.munchy.utils.AppConstants.Companion.QUERY_TYPE
+import com.est.munchy.utils.NetworkChecker
 import com.est.munchy.utils.NetworkResponse
 import com.est.munchy.viewModels.events.MainEvent
 import com.est.munchy.viewModels.states.MainUiState
+import com.est.munchy.viewModels.states.RecipesUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,11 +44,15 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val repository: Repository,
     private val dataStoreRepository: DataStoreRepository,
+    private val networkChecker: NetworkChecker,
     application: Application
 ) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(MainUiState())
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+
+    private val _netState = MutableStateFlow(RecipesUiState())
+    val netState: StateFlow<RecipesUiState> = _netState.asStateFlow()
 
     init {
         Timber.tag("MainViewModel").d("ViewModel initialized")
@@ -97,7 +103,7 @@ class MainViewModel @Inject constructor(
         val currentTime = System.currentTimeMillis()
         val updateInterval = 24 * 60 * 60 * 1000
 
-        if (currentTime - lastUpdate > updateInterval && hasInternetConnection()) {
+        if (currentTime - lastUpdate > updateInterval && _netState.value.isNetworkAvailable){
             try {
                 Timber.d("Starting recipe refresh...")
                 _uiState.update { it.copy(isLoading = true) }
@@ -228,15 +234,26 @@ class MainViewModel @Inject constructor(
             else -> NetworkResponse.ErrorResponse("Joke unavailable")
         }
 
-    private fun hasInternetConnection(): Boolean {
-        val cm = getApplication<Application>()
-            .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        return cm.activeNetwork?.let { network ->
-            cm.getNetworkCapabilities(network)?.run {
-                hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
-                        hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+    private fun observeNetworkStatus() {
+        viewModelScope.launch {
+            networkChecker.getNetworkAvailability().collect { isNetworkAvailable ->
+                val wasUnavailable = !_netState.value.isNetworkAvailable
+                _netState.update { state ->
+                    state.copy(
+                        isNetworkAvailable = isNetworkAvailable,
+                        networkMessage = when {
+                            !isNetworkAvailable -> "Network Unavailable"
+                            wasUnavailable && isNetworkAvailable -> "Back Online"
+                            else -> null
+                        }
+                    )
+                }
+                _netState.update  { it.copy(
+                    isNetworkAvailable = isNetworkAvailable,
+                    networkMessage = _netState.value.networkMessage
+                )}
             }
-        } ?: false
+        }
     }
 
     private fun applyQueries() = mapOf(

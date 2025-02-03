@@ -14,8 +14,8 @@ data class RecipesUiState(
         selectedDietType = AppConstants.DEFAULT_DIET_TYPE,
         selectedDietTypeId = 0
     ),
-    val isOnline: Boolean = true,
-    val wasOffline: Boolean = false,
+    val isNetworkAvailable: Boolean = true,
+    val networkMessage: String? = null,
     val searchQuery: String = "",
     val selectedRecipe: ModelResult? = null,
 )

@@ -15,6 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.utils.AppConstants
+import com.est.munchy.utils.ShimmerLazyRowItem
+import com.est.munchy.utils.ShimmerRecipeCardItem
 import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.events.MainEvent
 
@@ -66,7 +68,7 @@ fun FoodJokeScreen(
         ) {
             when {
                 uiState.isLoading -> {
-                    CircularProgressIndicator()
+                    ShimmerLazyRowItem()
                 }
                 uiState.error != null -> {
                     Text(

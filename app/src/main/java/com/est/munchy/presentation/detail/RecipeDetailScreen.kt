@@ -55,6 +55,7 @@ import coil.compose.AsyncImage
 import com.est.munchy.domain.model.Ingredients
 import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.utils.AppConstants
+import com.est.munchy.utils.ShimmerRecipeCardItem
 import com.est.munchy.utils.fetchInstructionsContent
 import com.est.munchy.viewModels.RecipeViewModel
 import com.est.munchy.viewModels.events.RecipesEvent
@@ -117,11 +118,12 @@ fun RecipeDetailScreen(
 
             // Loading State
             if (recipeState.isLoading) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                Column(
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    CircularProgressIndicator()
+                    repeat(4) {
+                        ShimmerRecipeCardItem()
+                    }
                 }
             }
 

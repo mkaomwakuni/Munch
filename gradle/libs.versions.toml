@@ -1,4 +1,5 @@
 [versions]
+accompanistSwiperefresh = "0.31.3-beta"
 agp = "8.7.2"
 coilCompose = "3.0.4"
 coilComposeVersion = "2.6.0"
@@ -19,6 +20,7 @@ lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.9.3"
 composeBom = "2024.11.00"
 lottie = "6.5.1"
+lottieCompose = "6.3.0"
 retrofit = "2.11.0"
 okhttp = "5.0.0-alpha.11"
 koin = "3.5.6"
@@ -34,6 +36,7 @@ coroutines = "1.9.0"
 navigation = "2.8.4"
 
 [libraries]
+accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
@@ -68,6 +71,7 @@ kotlinx-coroutines-android-v171 = { module = "org.jetbrains.kotlinx:kotlinx-coro
 kotlinx-coroutines-core-v171 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
 lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }

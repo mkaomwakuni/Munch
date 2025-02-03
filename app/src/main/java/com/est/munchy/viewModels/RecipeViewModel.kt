@@ -42,27 +42,11 @@ class RecipeViewModel @Inject constructor(
      */
     val uiState: StateFlow<RecipesUiState> = _uiState.asStateFlow()
 
-    /**
-     * Indicates the current network status.
-     */
-    var networkStatus = false
-
-    /**
-     * Indicates if the device was previously offline and is now back online.
-     */
-    var backOnline = false
-
     init {
         viewModelScope.launch {
             // Collect meal and diet type preferences
             dataStoreRepository.readMealAndDietType.collect { preferences ->
                 _uiState.update { it.copy(mealAndDietType = preferences) }
-            }
-
-            // Monitor network availability
-            networkChecker.getNetworkAvailability().collect { isOnline ->
-                networkStatus = isOnline
-                showNetworkStatus()
             }
         }
     }
@@ -177,36 +161,5 @@ class RecipeViewModel @Inject constructor(
             dietType,
             dietTypeId
         )
-    }
-
-    /**
-     * Saves the back online status to DataStore.
-     *
-     * @param backOnline Boolean indicating if the device is back online.
-     */
-    private fun saveBackOnline(backOnline: Boolean) =
-        viewModelScope.launch(Dispatchers.IO) {
-            dataStoreRepository.saveBackOnline(backOnline)
-        }
-
-    /**
-     * Updates the UI state based on the current network status.
-     */
-    private fun showNetworkStatus() {
-        if (!networkStatus) {
-            _uiState.update { it.copy(
-                error = "No Internet Connection",
-                wasOffline = true
-            ) }
-            saveBackOnline(true)
-        } else if (networkStatus) {
-            if (backOnline) {
-                _uiState.update { it.copy(
-                    error = "We're back online.",
-                    wasOffline = false
-                ) }
-                saveBackOnline(false)
-            }
-        }
     }
 }
