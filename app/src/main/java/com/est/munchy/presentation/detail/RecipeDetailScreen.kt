@@ -98,79 +98,8 @@ fun RecipeDetailScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(260.dp)
-            ) {
-                recipe?.image?.let { imageUrl ->
-                    AsyncImage(
-                        model = imageUrl,
-                        contentDescription = recipe.title,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .height(260.dp),
-                        contentScale = ContentScale.Crop
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .align(Alignment.BottomStart)
-                        .padding(8.dp)
-                        .background(
-                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f), shape = RoundedCornerShape(4.dp)
-                        )
-                        .wrapContentWidth()
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .size(20.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${recipe?.readyInMinutes} min ",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
-                    Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .size(20.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${recipe?.aggregateLikes} likes",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(25.dp)
-                            .clickable(
-                                onClick = { /* Handle favorite button click */ }
-                            ),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+            //Recipe Header
+            RecipeHeader(recipe = recipe)
 
             // Tab Row
             TabRow(
@@ -202,7 +131,10 @@ fun RecipeDetailScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(error, color = MaterialTheme.colorScheme.error)
+                    Text(
+                        text = "Error : $error" ,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
@@ -221,7 +153,81 @@ fun RecipeDetailScreen(
         }
     }
 }
+@Composable
+private fun RecipeHeader(recipe: ModelResult?) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(260.dp)
+    ) {
+        // Recipe Image
+        recipe?.image?.let { imageUrl ->
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = recipe.title,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .height(260.dp),
+                contentScale = ContentScale.Crop
+            )
+        }
 
+        // Recipe Metadata (Time and Likes)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(8.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(4.dp)
+                )
+                .wrapContentWidth()
+        ) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "${recipe?.readyInMinutes} min",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.width(20.dp))
+            Icon(
+                imageVector = Icons.Default.FavoriteBorder,
+                contentDescription = null,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = "${recipe?.aggregateLikes} likes",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        // Favorite Button
+        Icon(
+            imageVector = Icons.Default.Favorite,
+            contentDescription = null,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(8.dp)
+                .size(25.dp)
+                .clickable { /* Handle favorite button click */ },
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
 @Composable
 fun OverviewSection(recipe: ModelResult?) {
     LazyColumn(

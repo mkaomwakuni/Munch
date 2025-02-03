@@ -159,7 +159,6 @@ class MainViewModel @Inject constructor(
     private fun addFavorite(recipe: ModelResult) = viewModelScope.launch {
         try {
             repository.local.insertBooked(BookedRecipeEntity(result = recipe))
-//            Timber.d("Added favorite: ${recipe.title}")
         } catch (e: Exception) {
             Timber.e("Save failed: ${e.message}")
             _uiState.update { it.copy(error = "Save failed") }

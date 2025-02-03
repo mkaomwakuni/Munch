@@ -71,7 +71,7 @@ fun FavouritesScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Favourites",
+                        text = "Favourites",
                         fontWeight = FontWeight.Bold
                     )
                 },
