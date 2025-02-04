@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -41,6 +42,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,6 +64,8 @@ import timber.log.Timber
 @Composable
 fun HomeScreen(
     navController: NavController,
+    onToggleTheme: () -> Unit,
+    isDarkTheme:Boolean,
     mainViewModel: MainViewModel = hiltViewModel(),
     recipesViewModel: RecipeViewModel = hiltViewModel()
 ) {
@@ -108,6 +113,13 @@ fun HomeScreen(
                             contentDescription = "Notifications"
                         )
                     }
+                    Switch(
+                        checked = isDarkTheme,
+                        onCheckedChange = {onToggleTheme()},
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .semantics { contentDescription = "Toggle dark theme" }
+                    )
                 }
             )
         },
