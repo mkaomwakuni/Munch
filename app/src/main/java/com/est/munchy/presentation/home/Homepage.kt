@@ -95,6 +95,8 @@ fun HomeScreen(
             )
 
         }
+    }
+    LaunchedEffect(Unit) {
         mainViewModel.onEvent(MainEvent.RefreshRecipes)
     }
 

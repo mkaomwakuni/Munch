@@ -57,12 +57,3 @@ fun BottomNavigation(
         }
     }
 }
-
-@Preview
-@Composable
-fun BottomNavigationPreview() {
-    Surface(color = MaterialTheme.colorScheme.background) {
-        val navController = rememberNavController()
-        BottomNavigation(navController)
-    }
-}

@@ -111,13 +111,13 @@ dependencies {
     implementation (libs.gson)
 
     //Animations
-    implementation (libs.lottie)
+    implementation(libs.lottie.compose)
 
     // Jsoup for parse
     implementation (libs.jsoup)
 
     //Swipe
-    implementation ("com.google.accompanist:accompanist-swiperefresh:0.31.3-beta")
+    implementation (libs.accompanist.swiperefresh)
 
     // Testing
     testImplementation(libs.junit)
