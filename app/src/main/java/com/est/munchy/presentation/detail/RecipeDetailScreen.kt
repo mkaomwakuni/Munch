@@ -26,7 +26,6 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -225,7 +224,9 @@ private fun RecipeHeader(recipe: ModelResult?) {
                 .align(Alignment.BottomEnd)
                 .padding(8.dp)
                 .size(25.dp)
-                .clickable { /* Handle favorite button click */ },
+                .clickable {
+
+                },
             tint = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

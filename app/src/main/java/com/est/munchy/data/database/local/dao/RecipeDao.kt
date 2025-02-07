@@ -22,7 +22,7 @@ interface MunchDao {
      * @param recipesEntity The RecipeEntity object to insert.
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRecipes(recipesEntity: RecipeEntity)
+    suspend fun insertRecipe(recipe: RecipeEntity)
 
     /**
      * Inserts a bookmarked recipe into the booked_table.

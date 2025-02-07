@@ -43,7 +43,7 @@ class LocalDataSource @Inject constructor(
      * @param recipeEntity The RecipeEntity object to insert.
      */
     suspend fun insertRecipes(recipeEntity: RecipeEntity) {
-        munchDao.insertRecipes(recipeEntity)
+        munchDao.insertRecipe(recipeEntity)
     }
 
     /**
