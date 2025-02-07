@@ -1,11 +1,13 @@
 package com.est.munchy.presentation.home
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,13 +20,16 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -37,11 +42,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,26 +61,53 @@ import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.presentation.components.RecipePreviewContent
 import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.presentation.navigation.Routes
+import com.est.munchy.utils.ShimmerRecipeCardItem
 import com.est.munchy.viewModels.MainViewModel
-import com.est.munchy.viewModels.RecipeViewModel
 import com.est.munchy.viewModels.events.MainEvent
 import timber.log.Timber
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
     mainViewModel: MainViewModel = hiltViewModel(),
-    recipesViewModel: RecipeViewModel = hiltViewModel()
 ) {
-    val uiState = mainViewModel.uiState.collectAsState().value
+    // Collect the UI state from the ViewModel
+    val uiState by mainViewModel.uiState.collectAsState()
+    val netState by mainViewModel.netState.collectAsState()
+    // State hoisting for selected recipe and bottom sheet
     var selectedRecipe by remember { mutableStateOf<ModelResult?>(null) }
     val modalSheetState = rememberModalBottomSheetState()
     var showBottomSheet by remember { mutableStateOf(false) }
+    val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        mainViewModel.onEvent(MainEvent.RefreshRecipes)
+    // Filter recipes based on the UI state
+    val filteredRecipes = remember ( uiState.recipes ) {
+        uiState.recipes.filter {
+            it.title.isNotEmpty()
+        }
+    }
+
+    // Handle network state changes
+    LaunchedEffect(netState.isNetworkAvailable, netState.networkMessage) {
+        // Handle network state changes
+        if (!netState.isNetworkAvailable && uiState.recipes.isEmpty()) {
+            snackBarHostState.showSnackbar(
+                message = "Connection Lost.",
+                duration = SnackbarDuration.Short
+            )
+        }
+
+        netState.networkMessage?.let { message ->
+            snackBarHostState.showSnackbar(
+                message = message,
+                duration = SnackbarDuration.Short,
+                withDismissAction = true
+            )
+            mainViewModel.onEvent(MainEvent.ClearError)
+            mainViewModel.onEvent(MainEvent.RefreshRecipes)
+        }
     }
 
     if (showBottomSheet && selectedRecipe != null){
@@ -93,6 +130,7 @@ fun HomeScreen(
     }
 
     Scaffold(
+        contentWindowInsets = WindowInsets.systemBars.exclude(WindowInsets.navigationBars),
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
@@ -112,12 +150,44 @@ fun HomeScreen(
             )
         },
         bottomBar = { BottomNavigation(navController) },
-        contentWindowInsets = WindowInsets(0)
+        snackbarHost = {
+            Box(modifier = Modifier.fillMaxWidth()) {
+                SnackbarHost(
+                    hostState = snackBarHostState,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(10.dp)
+                ){ data ->
+                    Snackbar(
+                        modifier = Modifier
+                            .height(30.dp)
+                            .fillMaxWidth(),
+                        containerColor = when {
+                            !netState.isNetworkAvailable -> Color.Red
+                            netState.networkMessage == "Back Online" -> Color.Green
+                            else -> MaterialTheme.colorScheme.inverseSurface
+                        },
+                        contentColor = Color.White
+                    ){
+                        Text(
+                            text = data.visuals.message,
+                            fontSize = 12.sp,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        )
+                    }
+                }
+            }
+        }
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(16.dp)
+                .padding(
+                    top = padding.calculateTopPadding(),
+                    start = padding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = padding.calculateEndPadding(LayoutDirection.Ltr)
+                )
+                .padding(12.dp)
         ) {
             // Welcome Text
             Text(
@@ -148,11 +218,13 @@ fun HomeScreen(
             // Content
             when {
                 uiState.isLoading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        CircularProgressIndicator()
+                        items(5) {
+                            ShimmerRecipeCardItem()
+                        }
                     }
                 }
                 uiState.error != null -> {
@@ -161,13 +233,13 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = uiState.error,
+                            text = uiState.error!!,
                             color = MaterialTheme.colorScheme.error,
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
                 }
-                uiState.recipes.isEmpty() -> {
+                filteredRecipes.isEmpty() -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -180,9 +252,11 @@ fun HomeScreen(
                 }
                 else -> {
                     LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        items(uiState.recipes) { recipe ->
+                        items(
+                            items = filteredRecipes,
+                            key = {it.recipeId}) { recipe ->
 
                             RecipeCard(
                                 recipe = recipe.recipeId.let { recipe },
@@ -194,8 +268,8 @@ fun HomeScreen(
                                     selectedRecipe = recipe
                                     showBottomSheet = true
                                     Timber.tag("Recipe").d("Navigating with recipe: $recipe")
-                                }
-                            )
+                                },
+                                modifier = Modifier.animateItem())
                         }
                     }
                 }
@@ -207,6 +281,7 @@ fun HomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeCard(
+    modifier: Modifier = Modifier,
     recipe: ModelResult,
     onFavoriteClick: () -> Unit,
     onItemClick: () -> Unit
@@ -280,7 +355,7 @@ fun RecipeCard(
                         onClick = onFavoriteClick
                     ) {
                         Icon(
-                            Icons.Outlined.FavoriteBorder, // Replace with appropriate favorite icon
+                            Icons.Outlined.FavoriteBorder,
                             contentDescription = "Add to favorites",
                             tint = Color.White
                         )

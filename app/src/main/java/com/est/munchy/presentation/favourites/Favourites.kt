@@ -71,7 +71,7 @@ fun FavouritesScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        "Favourites",
+                        text = "Favourites",
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -143,7 +143,7 @@ fun FavouritesScreen(
                                     }
                                 },
                                 onRecipeClick = {
-                                    navController.navigate(Routes.RecipeScreen.route + "/${"/${recipe.result.recipeId}"}")
+                                    navController.navigate(Routes.RecipeScreen.route + "/${recipe.result.recipeId}")
                                 }
                             )
                         }
@@ -194,7 +194,7 @@ fun FavoriteRecipeCard(
         onClick = onRecipeClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(120.dp)
+            .height(140.dp)
             .padding(8.dp)
     ) {
         Row(
@@ -207,7 +207,7 @@ fun FavoriteRecipeCard(
                 model = recipe.image,
                 contentDescription = recipe.title,
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(140.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop
             )

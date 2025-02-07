@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material3)
 
     // Hilt for Dependency Injection
     implementation (libs.hilt.android)
@@ -110,17 +110,14 @@ dependencies {
     // Gson
     implementation (libs.gson)
 
-    // Shimmer
-    implementation (libs.shimmer)
-
     //Animations
-    implementation (libs.lottie)
+    implementation(libs.lottie.compose)
 
-    // Jsoup
+    // Jsoup for parse
     implementation (libs.jsoup)
 
     //Swipe
-    implementation ("com.google.accompanist:accompanist-swiperefresh:0.31.3-beta")
+    implementation (libs.accompanist.swiperefresh)
 
     // Testing
     testImplementation(libs.junit)
