@@ -38,7 +38,7 @@ import com.est.munchy.viewModels.RecipeViewModel
 
 @Composable
 fun NavGraph(
-    navController: NavHostController
+    navController: NavHostController, onToggleTheme:()-> Unit, isDarkTheme:Boolean
     ) {
     val recipeViewModel: RecipeViewModel = hiltViewModel()
     NavHost (
@@ -47,7 +47,7 @@ fun NavGraph(
     ) {
         composable(Routes.HomeScreen.route) {
             HomeScreen(
-                navController
+                navController, onToggleTheme = onToggleTheme, isDarkTheme = isDarkTheme
             )
         }
         composable(

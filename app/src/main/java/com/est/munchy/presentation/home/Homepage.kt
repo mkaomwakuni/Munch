@@ -53,6 +53,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -73,6 +74,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -89,11 +92,12 @@ import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.events.MainEvent
 import timber.log.Timber
 
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     navController: NavController,
+    onToggleTheme: () -> Unit,
+    isDarkTheme: Boolean,
     mainViewModel: MainViewModel = hiltViewModel(),
 ) {
     // Collect the UI state from the ViewModel
@@ -106,7 +110,7 @@ fun HomeScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     // Filter recipes based on the UI state
-    val filteredRecipes = remember ( uiState.recipes ) {
+    val filteredRecipes = remember(uiState.recipes) {
         uiState.recipes.filter {
             it.title.isNotEmpty()
         }
@@ -133,7 +137,7 @@ fun HomeScreen(
         }
     }
 
-    if (showBottomSheet && selectedRecipe != null){
+    if (showBottomSheet && selectedRecipe != null) {
         ModalBottomSheet(
             dragHandle = null,
             onDismissRequest = {
@@ -169,6 +173,13 @@ fun HomeScreen(
                             contentDescription = "Notifications"
                         )
                     }
+                    Switch(
+                        checked = isDarkTheme,
+                        onCheckedChange = { onToggleTheme() },
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .semantics { contentDescription = "Toggle dark theme" }
+                    )
                 }
             )
         },
@@ -180,7 +191,7 @@ fun HomeScreen(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(10.dp)
-                ){ data ->
+                ) { data ->
                     Snackbar(
                         modifier = Modifier
                             .height(30.dp)
@@ -191,7 +202,7 @@ fun HomeScreen(
                             else -> MaterialTheme.colorScheme.inverseSurface
                         },
                         contentColor = Color.White
-                    ){
+                    ) {
                         Text(
                             text = data.visuals.message,
                             fontSize = 12.sp,
@@ -279,7 +290,7 @@ fun HomeScreen(
                     ) {
                         items(
                             items = filteredRecipes,
-                            key = {it.recipeId}) { recipe ->
+                            key = { it.recipeId }) { recipe ->
 
                             RecipeCard(
                                 recipe = recipe.recipeId.let { recipe },
@@ -292,7 +303,8 @@ fun HomeScreen(
                                     showBottomSheet = true
                                     Timber.tag("Recipe").d("Navigating with recipe: $recipe")
                                 },
-                                modifier = Modifier.animateItem())
+                                modifier = Modifier.animateItem()
+                            )
                         }
                     }
                 }
