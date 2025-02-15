@@ -1,48 +1,26 @@
-/*
- * MIT License
- * 
- * Copyright (c) 2025 Husty9 
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- */
 package com.est.munchy.presentation.favourites
+
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -54,6 +32,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -63,14 +42,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.est.munchy.R
 import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.presentation.navigation.BottomNavigation
 import com.est.munchy.presentation.navigation.Routes
@@ -78,7 +61,10 @@ import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.events.MainEvent
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun FavouritesScreen(
     navController: NavController,
@@ -90,27 +76,7 @@ fun FavouritesScreen(
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "Favourites",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                actions = {
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(
-                            Icons.Default.Delete,
-                            contentDescription = "Delete"
-                        )
-                    }
-                }
-            )
-        },
-        bottomBar = {
-            BottomNavigation(navController)
-        },
+        bottomBar = { BottomNavigation(navController) },
         snackbarHost = { SnackbarHost(snackBarHostState) }
     ) { paddingValues ->
         Box(
@@ -118,98 +84,161 @@ fun FavouritesScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            when {
-                favoritesRecipes.isEmpty() -> {
-                    Column(
+            Column {
+                // Top Image with Fade Effect
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                ) {
+                    // Image
+                    Image(
+                        painter = painterResource(id = R.drawable.food),
+                        contentDescription = "Header Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                    // Gradient Overlay
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(120.dp)
-                                .padding(bottom = 16.dp),
-                            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-                        )
-                        Text(
-                            text = "No Recipes",
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
-                        )
-                    }
+                            .matchParentSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        MaterialTheme.colorScheme.background
+                                    ),
+                                    startY = 0f,
+                                    endY = 400f
+                                )
+                            )
+                    )
+
+                    // TopAppBar overlaid on the image
+                    TopAppBar(
+                        title = {
+                            Column {
+                                Text(
+                                    text = "Favourites",
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.White
+                                )
+                                Text(
+                                    text = "A Collection of Saved Recipes",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = Color.White.copy(alpha = 0.8f)
+                                )
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = { showDeleteDialog = true }) {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    tint = Color.White
+                                )
+                            }
+                        },
+                        modifier = Modifier.background(Color.Transparent)
+                    )
                 }
 
-                else -> {
-                    LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(
-                            items = favoritesRecipes,
-                            key = { recipe -> recipe.id } // Use a unique key (e.g., recipe.id)
-                        ) { recipe ->
-                            FavoriteRecipeCard(
-                                recipe = recipe.result,
-                                onDeleteClick = {
-                                    scope.launch {
-                                        viewModel.onEvent(MainEvent.RemoveFromFavorites(recipe))
-                                        snackBarHostState.showSnackbar(
-                                            message = "Recipe Deleted",
-                                            actionLabel = "Undo",
-                                            duration = SnackbarDuration.Short
-                                        ).let { result ->
-                                            if (result == SnackbarResult.ActionPerformed) {
-                                                viewModel.onEvent(MainEvent.AddToFavorites(recipe.result))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Recipes Grid
+                when {
+                    favoritesRecipes.isEmpty() -> {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Favorite,
+                                contentDescription = null,
+                                modifier = Modifier.size(120.dp),
+                                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+                            )
+                            Text("No Recipes", style = MaterialTheme.typography.headlineSmall)
+                        }
+                    }
+
+                    else -> {
+                        LazyVerticalStaggeredGrid(
+                            columns = StaggeredGridCells.Adaptive(150.dp),
+                            verticalItemSpacing = 8.dp,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            itemsIndexed(favoritesRecipes, key = { _, item -> item.id }) { index, recipe ->
+                                val randomHeight = remember(index) { maxOf(250.dp, (200 + (index % 5) * 30).dp) }
+                                FavoriteRecipeCard(
+                                    recipe = recipe.result,
+                                    height = randomHeight,
+                                    index = index,
+                                    onDeleteClick = {
+                                        scope.launch {
+                                            viewModel.onEvent(MainEvent.RemoveFromFavorites(recipe))
+                                            snackBarHostState.showSnackbar(
+                                                message = "Recipe Deleted",
+                                                actionLabel = "Undo",
+                                                duration = SnackbarDuration.Short
+                                            ).let { result ->
+                                                if (result == SnackbarResult.ActionPerformed) {
+                                                    viewModel.onEvent(
+                                                        MainEvent.AddToFavorites(
+                                                            recipe.result
+                                                        )
+                                                    )
+                                                }
                                             }
                                         }
+                                    },
+                                    onRecipeClick = {
+                                        navController.navigate(Routes.RecipeScreen.route + "/${recipe.result.recipeId}")
                                     }
-                                },
-                                onRecipeClick = {
-                                    navController.navigate(Routes.RecipeScreen.route + "/${recipe.result.recipeId}")
-                                }
-                            )
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
 
-        // Delete All Dialog
-        if (showDeleteDialog) {
-            AlertDialog(
-                onDismissRequest = { showDeleteDialog = false },
-                title = { Text("Delete All Favorites") },
-                text = { Text("Are you sure you want to delete all favorite recipes?") },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
+            if (showDeleteDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDeleteDialog = false },
+                    title = { Text("Delete All Favorites") },
+                    text = { Text("Are you sure you want to delete all favorite recipes?") },
+                    confirmButton = {
+                        TextButton(onClick = {
                             scope.launch {
-                                favoritesRecipes.forEach { recipe ->
-                                    viewModel.onEvent(MainEvent.RemoveFromFavorites(recipe))
+                                favoritesRecipes.forEach {
+                                    viewModel.onEvent(
+                                        MainEvent.RemoveFromFavorites(
+                                            it
+                                        )
+                                    )
                                 }
                                 snackBarHostState.showSnackbar("All recipes removed")
                             }
                             showDeleteDialog = false
-                        }
-                    ) {
-                        Text("Delete")
+                        }) { Text("Delete") }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
                     }
-                },
-                dismissButton = {
-                    TextButton(onClick = { showDeleteDialog = false }) {
-                        Text("Cancel")
-                    }
-                }
-            )
+                )
+            }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavoriteRecipeCard(
     recipe: ModelResult,
+    height: Dp,
+    index: Int,
     onDeleteClick: () -> Unit,
     onRecipeClick: () -> Unit
 ) {
@@ -217,61 +246,46 @@ fun FavoriteRecipeCard(
         onClick = onRecipeClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(140.dp)
-            .padding(8.dp)
+            .height(height)
+            .padding(
+                top = (index % 3 * 10).dp, // Slight overlap for staggered effect
+                bottom = 16.dp // Minimum padding at the bottom to prevent excessive overlap
+            )
+            .offset(y = if (index > 2) (-20).dp else 0.dp) // Slight offset for cascading effect
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Recipe Image
+        Box(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
                 model = recipe.image,
                 contentDescription = recipe.title,
-                modifier = Modifier
-                    .size(140.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            // Gradient Overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.4f)),
+                            startY = 0.6f
+                        )
+                    )
+            )
 
-            // Recipe Details
+            // Content
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(8.dp)
             ) {
                 Text(
                     text = recipe.title,
-                    style = MaterialTheme.typography.titleSmall,
+                    color = Color.White,
                     maxLines = 2,
-                    fontWeight = FontWeight.Bold,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleSmall
                 )
-
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = recipe.summary,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Check,
-                        contentDescription = null,
-                        modifier = Modifier.size(1.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${recipe.readyInMinutes} min, Preparation Time",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
             }
         }
     }

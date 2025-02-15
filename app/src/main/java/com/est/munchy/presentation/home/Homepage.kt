@@ -42,6 +42,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,6 +75,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -223,13 +225,13 @@ fun HomeScreen(
         ) {
             // Welcome Text
             Text(
-                "Find Best Recipe",
+                "Discover Delicious Recipes",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2E7D32)
             )
             Text(
-                "For Your Cooking",
+                "Get ready to embark on a delightful culinary \n journey all handpicked for you",
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.Gray
             )
@@ -319,7 +321,6 @@ fun RecipeCard(
     onFavoriteClick: () -> Unit,
     onItemClick: () -> Unit
 ) {
-    Timber.tag("RecipeCard").d("Recipe image URL: ${recipe.image}")
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -346,14 +347,43 @@ fun RecipeCard(
                 }
             )
 
-            // Overlay gradient and content
-            Column(
+            // Gradient overlay (fades from bottom to top)
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.4f)
+                            ),
+                            startY = -100f
+                        )
+                    )
+            )
+
+            // Favorite button
+            IconButton(
+                onClick = onFavoriteClick,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.Black.copy(alpha = 0.3f))
             ) {
-                // Recipe Title
+                Icon(
+                    imageVector = Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Add to favorites",
+                    tint = Color.White
+                )
+            }
+
+            // Bottom Content (Title and Info Row)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+            ) {
                 Text(
                     text = recipe.title,
                     style = MaterialTheme.typography.titleMedium,
@@ -361,36 +391,35 @@ fun RecipeCard(
                     fontWeight = FontWeight.Bold
                 )
 
-                // Recipe Info
+                // Recipe Info Row
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .padding(top = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Recipe details
-                    Column {
-                        Text(
-                            text = "${recipe.readyInMinutes} mins",
-                            color = Color.White,
-                            fontSize = 14.sp
-                        )
-                        if (recipe.sourceName != null) {
-                            Text(
-                                text = "By ${recipe.sourceName}",
-                                color = Color.White,
-                                fontSize = 12.sp
-                            )
-                        }
-                    }
 
-                    // Favorite button
-                    IconButton(
-                        onClick = onFavoriteClick
-                    ) {
-                        Icon(
-                            Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Add to favorites",
-                            tint = Color.White
+                    Text(
+                        text = "${recipe.readyInMinutes} mins",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.White.copy(alpha = 0.3f))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Source Name with translucent background
+                    recipe.sourceName?.let {
+                        Text(
+                            text = "By $it",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color.White.copy(alpha = 0.3f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
                 }
