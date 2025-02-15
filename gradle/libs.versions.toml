@@ -1,5 +1,6 @@
 [versions]
 accompanistSwiperefresh = "0.31.3-beta"
+accompanistSystemuicontrollerVersion = "0.31.1-alpha"
 agp = "8.7.2"
 coilCompose = "3.0.4"
 coilComposeVersion = "2.6.0"
@@ -43,6 +44,7 @@ androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-com
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-kt-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
+google-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontrollerVersion" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidCompiler" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }

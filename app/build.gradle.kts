@@ -117,7 +117,8 @@ dependencies {
     implementation (libs.jsoup)
 
     //Swipe
-    implementation (libs.accompanist.swiperefresh)
+
+    implementation (libs.google.accompanist.systemuicontroller)
 
     // Testing
     testImplementation(libs.junit)
