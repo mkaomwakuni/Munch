@@ -24,17 +24,24 @@
 package com.est.munchy.presentation.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -53,7 +60,6 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -66,16 +72,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.exclude
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -173,12 +173,10 @@ fun HomeScreen(
                             contentDescription = "Notifications"
                         )
                     }
-                    Switch(
+                    RectangularSwitch(
                         checked = isDarkTheme,
                         onCheckedChange = { onToggleTheme() },
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .semantics { contentDescription = "Toggle dark theme" }
+                        modifier = Modifier.padding(end = 8.dp)
                     )
                 }
             )
@@ -420,4 +418,37 @@ fun SearchBar(
         ),
         singleLine = true
     )
+}
+
+
+@Composable
+fun RectangularSwitch(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Define colors for the switch
+    val trackColor = if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    val thumbColor = if (checked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
+    // Define dimensions for the switch
+    val trackWidth = 40.dp
+    val trackHeight = 20.dp
+    val thumbSize = 16.dp
+
+    Box(
+        modifier = modifier
+            .size(trackWidth, trackHeight)
+            .clip(RoundedCornerShape(0.dp)) // Rectangular shape
+            .background(trackColor)
+            .clickable { onCheckedChange(!checked) }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(thumbSize)
+                .clip(RoundedCornerShape(0.dp)) // Rectangular thumb
+                .background(thumbColor)
+                .align(if (checked) Alignment.CenterEnd else Alignment.CenterStart)
+        )
+    }
 }
