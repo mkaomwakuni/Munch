@@ -4,6 +4,8 @@ accompanistSystemuicontrollerVersion = "0.31.1-alpha"
 agp = "8.7.2"
 coilCompose = "3.0.4"
 coilComposeVersion = "2.6.0"
+coilGif = "2.5.0"
+coilKtCoilCompose = "2.5.0"
 datastorePreferences = "1.1.1"
 gson = "2.11.0"
 hiltAndroidCompiler = "2.52"
@@ -29,6 +31,7 @@ mapsCompose = "2.11.4"
 mapsSdk = "19.0.0"
 leakCanary = "2.14"
 roomKtx = "2.6.1"
+securityCrypto = "1.1.0-alpha06"
 shimmer = "0.5.0"
 timber = "5.0.1"
 kotlinxSerializationJson = "1.7.2"
@@ -42,8 +45,12 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
+androidx-security-crypto = { module = "androidx.security:security-crypto", version.ref = "securityCrypto" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
+coil-compose-v250 = { module = "io.coil-kt:coil-compose", version.ref = "coilKtCoilCompose" }
+coil-gif = { module = "io.coil-kt:coil-gif", version.ref = "coilGif" }
 coil-kt-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilComposeVersion" }
+coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coilGif" }
 google-accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanistSystemuicontrollerVersion" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroidCompiler" }
@@ -72,7 +79,6 @@ koin-compose = { group = "io.insert-koin", name = "koin-androidx-compose", versi
 kotlinx-coroutines-android-v171 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-core-v171 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
-lottie = { module = "com.airbnb.android:lottie", version.ref = "lottie" }
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottieCompose" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "retrofit" }

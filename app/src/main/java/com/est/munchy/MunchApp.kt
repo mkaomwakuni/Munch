@@ -24,14 +24,20 @@
 package com.est.munchy
 
 import android.app.Application
+import com.est.munchy.utils.CryptoHelper
 import com.squareup.leakcanary.core.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
 @HiltAndroidApp
 class MunchApp: Application(){
+    lateinit var cryptoHelper: CryptoHelper
     override fun onCreate() {
         super.onCreate()
+        cryptoHelper = CryptoHelper(this)
+        if (cryptoHelper.getApiKey().isNullOrEmpty()) {
+            cryptoHelper.storeApiKey("")
+        }
         if (BuildConfig.DEBUG){
             Timber.plant(Timber.DebugTree())
         }

@@ -1,4 +1,6 @@
 import org.gradle.kotlin.dsl.implementation
+import java.util.*
+import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
@@ -90,10 +92,12 @@ dependencies {
     // Room for Local Database
     implementation (libs.androidx.room.ktx)
     implementation(libs.room.runtime)
-    kapt ("androidx.room:room-compiler:2.6.1")
+    //noinspection KaptUsageInsteadOfKsp
+    kapt (libs.room.compiler)
 
     //Preference DataStore
     implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security.crypto)
 
     // Coroutines for Asynchronous Programming
     implementation(libs.coroutines.core)
@@ -103,21 +107,17 @@ dependencies {
     implementation(libs.navigation.compose)
 
     //Coil
-    implementation("io.coil-kt:coil-compose:2.5.0")
-    implementation("io.coil-kt:coil-gif:2.5.0")
-    implementation("io.coil-kt:coil-svg:2.5.0")
+    implementation(libs.coil.compose.v250)
+    implementation(libs.coil.gif)
+    implementation(libs.coil.svg)
 
     // Gson
     implementation (libs.gson)
 
-    //Animations
-    implementation(libs.lottie.compose)
-
     // Jsoup for parse
     implementation (libs.jsoup)
 
-    //Swipe
-
+    //controller
     implementation (libs.google.accompanist.systemuicontroller)
 
     // Testing
@@ -128,5 +128,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    testImplementation(kotlin("test"))
 
 }
