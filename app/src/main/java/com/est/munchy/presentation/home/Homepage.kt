@@ -47,6 +47,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Card
@@ -105,6 +106,8 @@ fun HomeScreen(
     // Collect the UI state from the ViewModel
     val uiState by mainViewModel.uiState.collectAsState()
     val netState by mainViewModel.netState.collectAsState()
+    val bookedRecipes by mainViewModel.uiState.collectAsState()
+
     // State hoisting for selected recipe and bottom sheet
     var selectedRecipe by remember { mutableStateOf<ModelResult?>(null) }
     val modalSheetState = rememberModalBottomSheetState()
@@ -294,6 +297,7 @@ fun HomeScreen(
 
                             RecipeCard(
                                 recipe = recipe.recipeId.let { recipe },
+                                isFavorite = bookedRecipes.any { it.id == recipe.recipeId },
                                 onFavoriteClick = {
                                     mainViewModel.onEvent(MainEvent.AddToFavorites(recipe))
                                     Timber.tag("Recipe").d("Adding to favorites: $recipe")
@@ -318,6 +322,7 @@ fun HomeScreen(
 fun RecipeCard(
     modifier: Modifier = Modifier,
     recipe: ModelResult,
+    isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
     onItemClick: () -> Unit
 ) {
@@ -364,7 +369,9 @@ fun RecipeCard(
 
             // Favorite button
             IconButton(
-                onClick = onFavoriteClick,
+                onClick = {
+                    onFavoriteClick()
+                },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(8.dp)
@@ -372,9 +379,9 @@ fun RecipeCard(
                     .background(Color.Black.copy(alpha = 0.3f))
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.FavoriteBorder,
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                     contentDescription = "Add to favorites",
-                    tint = Color.White
+                    tint = if (isFavorite) Color.Red else Color.White
                 )
             }
 

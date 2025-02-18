@@ -1,15 +1,19 @@
 package com.est.munchy.presentation.favourites
 
+
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -32,7 +36,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -61,10 +64,7 @@ import com.est.munchy.viewModels.MainViewModel
 import com.est.munchy.viewModels.events.MainEvent
 import kotlinx.coroutines.launch
 
-@OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun FavouritesScreen(
     navController: NavController,
@@ -77,7 +77,8 @@ fun FavouritesScreen(
 
     Scaffold(
         bottomBar = { BottomNavigation(navController) },
-        snackbarHost = { SnackbarHost(snackBarHostState) }
+        snackbarHost = { SnackbarHost(snackBarHostState) },
+        contentWindowInsets = WindowInsets.navigationBars
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -96,7 +97,9 @@ fun FavouritesScreen(
                         painter = painterResource(id = R.drawable.food),
                         contentDescription = "Header Image",
                         contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black)
                     )
 
                     // Gradient Overlay
@@ -108,40 +111,43 @@ fun FavouritesScreen(
                                     colors = listOf(
                                         Color.Transparent,
                                         MaterialTheme.colorScheme.background
-                                    ),
-                                    startY = 0f,
-                                    endY = 400f
+                                    )
                                 )
                             )
                     )
 
                     // TopAppBar overlaid on the image
-                    TopAppBar(
-                        title = {
-                            Column {
-                                Text(
-                                    text = "Favourites",
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color.White
-                                )
-                                Text(
-                                    text = "A Collection of Saved Recipes",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = Color.White.copy(alpha = 0.8f)
-                                )
-                            }
-                        },
-                        actions = {
-                            IconButton(onClick = { showDeleteDialog = true }) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = "Delete",
-                                    tint = Color.White
-                                )
-                            }
-                        },
-                        modifier = Modifier.background(Color.Transparent)
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = 16.dp, end = 16.dp, top = 80.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(
+                                text = "Favourites",
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF2E7D32),
+                                style = MaterialTheme.typography.headlineSmall
+                            )
+                            Text(
+                                text = "A Collection of Saved Recipes",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { showDeleteDialog = true }
+                        ) {
+                            Icon(
+                                Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = Color.Red
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -204,35 +210,36 @@ fun FavouritesScreen(
                     }
                 }
             }
-
-            if (showDeleteDialog) {
-                AlertDialog(
-                    onDismissRequest = { showDeleteDialog = false },
-                    title = { Text("Delete All Favorites") },
-                    text = { Text("Are you sure you want to delete all favorite recipes?") },
-                    confirmButton = {
-                        TextButton(onClick = {
-                            scope.launch {
-                                favoritesRecipes.forEach {
-                                    viewModel.onEvent(
-                                        MainEvent.RemoveFromFavorites(
-                                            it
-                                        )
-                                    )
-                                }
-                                snackBarHostState.showSnackbar("All recipes removed")
-                            }
-                            showDeleteDialog = false
-                        }) { Text("Delete") }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
-                    }
-                )
-            }
         }
     }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete All Favorites") },
+            text = { Text("Are you sure you want to delete all favorite recipes?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    scope.launch {
+                        favoritesRecipes.forEach {
+                            viewModel.onEvent(
+                                MainEvent.RemoveFromFavorites(
+                                    it
+                                )
+                            )
+                        }
+                        snackBarHostState.showSnackbar("All recipes removed")
+                    }
+                    showDeleteDialog = false
+                }) { Text("Delete") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel") }
+            }
+        )
+    }
 }
+
 
 @Composable
 fun FavoriteRecipeCard(
