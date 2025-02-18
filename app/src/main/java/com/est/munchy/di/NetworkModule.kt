@@ -26,8 +26,10 @@ package com.est.munchy.di
 
 import android.app.Application
 import android.content.Context
+import com.est.munchy.MunchApp
 import com.est.munchy.data.network.MunchApi
 import com.est.munchy.utils.AppConstants
+import com.est.munchy.utils.CryptoHelper
 import com.est.munchy.utils.NetworkChecker
 import dagger.Module
 import dagger.Provides
@@ -68,12 +70,28 @@ object NetworkModule {
      * @Provides Indicates that this method provides a dependency.
      * @Singleton Ensures only one instance of OkHttpClient is created.
      */
-    @Singleton
     @Provides
-    fun providesHttpClient(): OkHttpClient {
+    @Singleton
+    fun providesHttpClient(
+        @ApplicationContext context: Context
+    ): OkHttpClient {
+        val cryptoHelper = (context.applicationContext as MunchApp).cryptoHelper
+
         return OkHttpClient.Builder()
-            .readTimeout(20, TimeUnit.SECONDS)
-            .connectTimeout(20, TimeUnit.SECONDS)
+            .addInterceptor { chain ->
+                val original = chain.request()
+                val originalHttpUrl = original.url
+
+                // Get encrypted API key
+                val apiKey = cryptoHelper.getApiKey() ?: throw IllegalStateException("API key not configured")
+
+                val url = originalHttpUrl.newBuilder()
+                    .addQueryParameter("apiKey", apiKey)
+                    .build()
+
+                val requestBuilder = original.newBuilder().url(url)
+                chain.proceed(requestBuilder.build())
+            }
             .build()
     }
 
@@ -185,4 +203,10 @@ object AppModule {
     fun provideContext(application: Application): Context {
         return application.applicationContext
     }
+
+    @Provides
+    @Singleton
+        fun provideCryptoHelper(
+            @ApplicationContext context: Context
+        ): CryptoHelper = CryptoHelper(context)
 }
