@@ -31,6 +31,8 @@ import androidx.room.Query
 import com.est.munchy.data.database.local.entities.BookedRecipeEntity
 import com.est.munchy.data.database.local.entities.FoodJokesEntity
 import com.est.munchy.data.database.local.entities.RecipeEntity
+import com.est.munchy.utils.AppConstants.Companion.FAVORITES_TABLE
+import com.est.munchy.utils.AppConstants.Companion.RECIPES_TABLE
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -96,4 +98,7 @@ interface MunchDao {
      */
     @Query("DELETE FROM booked_table")
     suspend fun deleteAllBookedRecipe()
+
+    @Query("SELECT EXISTS(SELECT 1 FROM $FAVORITES_TABLE WHERE id = :recipeId LIMIT 1)")
+    suspend fun isRecipeBooked(recipeId: Int): Boolean
 }

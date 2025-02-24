@@ -99,4 +99,8 @@ class LocalDataSource @Inject constructor(
     suspend fun deleteAllBooked() {
         munchDao.deleteAllBookedRecipe()
     }
+
+    suspend fun checkFavourites(recipeId: Int): Boolean {
+        return munchDao.isRecipeBooked(recipeId)
+    }
 }
