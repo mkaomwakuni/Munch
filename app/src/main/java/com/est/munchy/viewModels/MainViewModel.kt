@@ -34,7 +34,6 @@ import com.est.munchy.data.database.local.entities.RecipeEntity
 import com.est.munchy.domain.model.FoodJokes
 import com.est.munchy.domain.model.ModelResult
 import com.est.munchy.domain.model.MunchRecipe
-import com.est.munchy.utils.AppConstants.Companion.API_KEY
 import com.est.munchy.utils.AppConstants.Companion.DEFAULT_DIET_TYPE
 import com.est.munchy.utils.AppConstants.Companion.DEFAULT_MEAL_TYPE
 import com.est.munchy.utils.AppConstants.Companion.DEFAULT_RECIPES_NUMBER
@@ -45,6 +44,7 @@ import com.est.munchy.utils.AppConstants.Companion.QUERY_FILL_INGREDIENTS
 import com.est.munchy.utils.AppConstants.Companion.QUERY_NUMBER
 import com.est.munchy.utils.AppConstants.Companion.QUERY_SEARCH
 import com.est.munchy.utils.AppConstants.Companion.QUERY_TYPE
+import com.est.munchy.utils.CryptoHelper
 import com.est.munchy.utils.NetworkChecker
 import com.est.munchy.utils.NetworkResponse
 import com.est.munchy.viewModels.events.MainEvent
@@ -65,6 +65,7 @@ class MainViewModel @Inject constructor(
     private val repository: Repository,
     private val dataStoreRepository: DataStoreRepository,
     private val networkChecker: NetworkChecker,
+    private val cryptoHelper: CryptoHelper,
     application: Application
 ) : AndroidViewModel(application) {
 
@@ -74,11 +75,17 @@ class MainViewModel @Inject constructor(
     private val _netState = MutableStateFlow(RecipesUiState())
     val netState: StateFlow<RecipesUiState> = _netState.asStateFlow()
 
+
     init {
         observeLastUpdateTime()
         observeNetworkStatus()
         observeDatabase()
     }
+
+    // Add this helper property to get API key
+    private val apiKey: String
+        get() = cryptoHelper.getApiKey()
+            ?: throw IllegalStateException("API key not configured")
 
     private fun observeDatabase() {
         viewModelScope.launch {
@@ -186,11 +193,24 @@ class MainViewModel @Inject constructor(
     }
 
     private fun addFavorite(recipe: ModelResult) = viewModelScope.launch {
-        try {
-            repository.local.insertBooked(BookedRecipeEntity(result = recipe))
-        } catch (e: Exception) {
-            Timber.e("Save failed: ${e.message}")
-            _uiState.update { it.copy(error = "Save failed") }
+        val isBooked = repository.local.checkFavourites(recipe.recipeId)
+
+        if (isBooked) {
+            // Delete using both ID and result for safety
+            repository.local.deleteBookedRecipe(
+                BookedRecipeEntity(
+                    id = recipe.recipeId,
+                    result = recipe
+                )
+            )
+        } else {
+            // Insert with the complete result
+            repository.local.insertBooked(
+                BookedRecipeEntity(
+                    id = recipe.recipeId,
+                    result = recipe
+                )
+            )
         }
     }
 
@@ -207,7 +227,7 @@ class MainViewModel @Inject constructor(
     private fun getFoodJoke() = viewModelScope.launch {
         _uiState.update { it.copy(isLoading = true) }
         try {
-            val response = repository.remote.getFoodJoke(API_KEY)
+            val response = repository.remote.getFoodJoke(apiKey)
             when (val result = handleJokeResponse(response)) {
                 is NetworkResponse.SuccessResponse -> {
                     result.data?.let { joke ->
@@ -297,7 +317,7 @@ class MainViewModel @Inject constructor(
 
     private fun applyQueries() = mapOf(
         QUERY_NUMBER to DEFAULT_RECIPES_NUMBER,
-        QUERY_API_KEY to API_KEY,
+        QUERY_API_KEY to apiKey,
         QUERY_TYPE to DEFAULT_MEAL_TYPE,
         QUERY_DIET to DEFAULT_DIET_TYPE,
         QUERY_ADD_RECIPE_INFORMATION to "true",
@@ -307,7 +327,7 @@ class MainViewModel @Inject constructor(
     private fun applySearchQuery(query: String) = mapOf(
         QUERY_SEARCH to query,
         QUERY_NUMBER to DEFAULT_RECIPES_NUMBER,
-        QUERY_API_KEY to API_KEY,
+        QUERY_API_KEY to apiKey,
         QUERY_ADD_RECIPE_INFORMATION to "true",
         QUERY_FILL_INGREDIENTS to "true"
     )

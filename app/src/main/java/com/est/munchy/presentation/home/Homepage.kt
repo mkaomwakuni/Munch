@@ -24,21 +24,30 @@
 package com.est.munchy.presentation.home
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Card
@@ -53,7 +62,6 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -66,16 +74,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.exclude
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -103,6 +106,8 @@ fun HomeScreen(
     // Collect the UI state from the ViewModel
     val uiState by mainViewModel.uiState.collectAsState()
     val netState by mainViewModel.netState.collectAsState()
+    val bookedRecipes by mainViewModel.uiState.collectAsState()
+
     // State hoisting for selected recipe and bottom sheet
     var selectedRecipe by remember { mutableStateOf<ModelResult?>(null) }
     val modalSheetState = rememberModalBottomSheetState()
@@ -173,12 +178,10 @@ fun HomeScreen(
                             contentDescription = "Notifications"
                         )
                     }
-                    Switch(
+                    RectangularSwitch(
                         checked = isDarkTheme,
                         onCheckedChange = { onToggleTheme() },
-                        modifier = Modifier
-                            .padding(end = 8.dp)
-                            .semantics { contentDescription = "Toggle dark theme" }
+                        modifier = Modifier.padding(end = 8.dp)
                     )
                 }
             )
@@ -225,13 +228,13 @@ fun HomeScreen(
         ) {
             // Welcome Text
             Text(
-                "Find Best Recipe",
+                "Discover Delicious Recipes",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF2E7D32)
             )
             Text(
-                "For Your Cooking",
+                "Get ready to embark on a delightful culinary \n journey all handpicked for you",
                 style = MaterialTheme.typography.titleMedium,
                 color = Color.Gray
             )
@@ -294,6 +297,7 @@ fun HomeScreen(
 
                             RecipeCard(
                                 recipe = recipe.recipeId.let { recipe },
+                                isFavorite = bookedRecipes.any { it.id == recipe.recipeId },
                                 onFavoriteClick = {
                                     mainViewModel.onEvent(MainEvent.AddToFavorites(recipe))
                                     Timber.tag("Recipe").d("Adding to favorites: $recipe")
@@ -318,10 +322,10 @@ fun HomeScreen(
 fun RecipeCard(
     modifier: Modifier = Modifier,
     recipe: ModelResult,
+    isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
     onItemClick: () -> Unit
 ) {
-    Timber.tag("RecipeCard").d("Recipe image URL: ${recipe.image}")
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -348,14 +352,45 @@ fun RecipeCard(
                 }
             )
 
-            // Overlay gradient and content
-            Column(
+            // Gradient overlay (fades from bottom to top)
+            Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.SpaceBetween
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(
+                                Color.Transparent,
+                                Color.Black.copy(alpha = 0.4f)
+                            ),
+                            startY = -100f
+                        )
+                    )
+            )
+
+            // Favorite button
+            IconButton(
+                onClick = {
+                    onFavoriteClick()
+                },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(8.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.Black.copy(alpha = 0.3f))
             ) {
-                // Recipe Title
+                Icon(
+                    imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                    contentDescription = "Add to favorites",
+                    tint = if (isFavorite) Color.Red else Color.White
+                )
+            }
+
+            // Bottom Content (Title and Info Row)
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(16.dp)
+            ) {
                 Text(
                     text = recipe.title,
                     style = MaterialTheme.typography.titleMedium,
@@ -363,36 +398,35 @@ fun RecipeCard(
                     fontWeight = FontWeight.Bold
                 )
 
-                // Recipe Info
+                // Recipe Info Row
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .padding(top = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Recipe details
-                    Column {
-                        Text(
-                            text = "${recipe.readyInMinutes} mins",
-                            color = Color.White,
-                            fontSize = 14.sp
-                        )
-                        if (recipe.sourceName != null) {
-                            Text(
-                                text = "By ${recipe.sourceName}",
-                                color = Color.White,
-                                fontSize = 12.sp
-                            )
-                        }
-                    }
 
-                    // Favorite button
-                    IconButton(
-                        onClick = onFavoriteClick
-                    ) {
-                        Icon(
-                            Icons.Outlined.FavoriteBorder,
-                            contentDescription = "Add to favorites",
-                            tint = Color.White
+                    Text(
+                        text = "${recipe.readyInMinutes} mins",
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.White.copy(alpha = 0.3f))
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+
+                    Spacer(modifier = Modifier.width(8.dp))
+
+                    // Source Name with translucent background
+                    recipe.sourceName?.let {
+                        Text(
+                            text = "By $it",
+                            color = Color.White,
+                            fontSize = 12.sp,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color.White.copy(alpha = 0.3f))
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
                         )
                     }
                 }
@@ -420,4 +454,37 @@ fun SearchBar(
         ),
         singleLine = true
     )
+}
+
+
+@Composable
+fun RectangularSwitch(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Define colors for the switch
+    val trackColor = if (checked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    val thumbColor = if (checked) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+
+    // Define dimensions for the switch
+    val trackWidth = 40.dp
+    val trackHeight = 20.dp
+    val thumbSize = 16.dp
+
+    Box(
+        modifier = modifier
+            .size(trackWidth, trackHeight)
+            .clip(RoundedCornerShape(0.dp)) // Rectangular shape
+            .background(trackColor)
+            .clickable { onCheckedChange(!checked) }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(thumbSize)
+                .clip(RoundedCornerShape(0.dp)) // Rectangular thumb
+                .background(thumbColor)
+                .align(if (checked) Alignment.CenterEnd else Alignment.CenterStart)
+        )
+    }
 }
