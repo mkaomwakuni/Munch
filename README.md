@@ -1,4 +1,3 @@
-![image](https://github.com/user-attachments/assets/601213bb-6447-473f-a508-9279d35e5be3)# Munchy - Recipe App
 
 A modern Android recipe application built with Jetpack Compose and following clean architecture principles.
 
